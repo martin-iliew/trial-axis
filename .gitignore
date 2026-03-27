@@ -1,0 +1,21 @@
+.agent/
+
+# dependencies
+**/node_modules/
+
+# local build outputs
+**/dist/
+**/dist-ssr/
+**/.expo/
+**/web-build/
+shared/design-tokens/dist/
+
+# local environment and editor state
+*.local
+*.tsbuildinfo
+*.log
+apps/mobile/install.log
+
+# .NET build outputs
+**/bin/
+**/obj/
