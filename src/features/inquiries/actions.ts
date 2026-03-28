@@ -6,23 +6,20 @@ import { revalidatePath } from "next/cache"
 
 const sendInquirySchema = z.object({
   matchResultId: z.string().min(1, "Match result ID is required"),
+  subject: z.string().min(1, "Subject is required"),
   message: z.string().min(1, "Message is required"),
-  notes: z.string().optional(),
 })
 
 const respondToInquirySchema = z.object({
   inquiryId: z.string().min(1, "Inquiry ID is required"),
   action: z.enum(["accepted", "declined"]),
-  data: z.object({
-    response_message: z.string().optional(),
-    decline_reason: z.string().optional(),
-  }),
+  message: z.string().optional(),
 })
 
 export async function sendInquiry(data: {
   matchResultId: string
+  subject: string
   message: string
-  notes?: string
 }) {
   const result = sendInquirySchema.safeParse(data)
   if (!result.success) return { error: result.error.issues[0].message }
@@ -31,9 +28,15 @@ export async function sendInquiry(data: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("organization_id")
+    .eq("id", user.id)
+    .single()
+
   const { data: matchResult } = await supabase
     .from("match_results")
-    .select("*")
+    .select("id, project_id, status")
     .eq("id", result.data.matchResultId)
     .single()
 
@@ -41,33 +44,44 @@ export async function sendInquiry(data: {
 
   const { data: trialProject } = await supabase
     .from("trial_projects")
-    .select("id, sponsor_user_id")
-    .eq("id", matchResult.trial_project_id)
+    .select("id, organization_id")
+    .eq("id", matchResult.project_id)
+    .eq("organization_id", profile?.organization_id ?? "")
     .single()
 
-  if (!trialProject || trialProject.sponsor_user_id !== user.id) {
-    return { error: "Not authorized" }
-  }
+  if (!trialProject) return { error: "Not authorized" }
 
   if (matchResult.status !== "pending") {
     return { error: "Inquiry already sent for this match" }
   }
 
-  const { error: insertError } = await supabase
-    .from("partnership_inquiries")
+  const { data: inquiry, error: inquiryError } = await supabase
+    .from("inquiries")
     .insert({
       match_result_id: result.data.matchResultId,
-      sender_user_id: user.id,
-      message: result.data.message,
-      notes: result.data.notes ?? null,
-      status: "pending" as const,
+      created_by: user.id,
+      subject: result.data.subject,
+      status: "open",
+    })
+    .select()
+    .single()
+
+  if (inquiryError) return { error: inquiryError.message }
+
+  const { error: messageError } = await supabase
+    .from("inquiry_messages")
+    .insert({
+      inquiry_id: inquiry.id,
+      sender_id: user.id,
+      type: "text",
+      content: result.data.message,
     })
 
-  if (insertError) return { error: insertError.message }
+  if (messageError) return { error: messageError.message }
 
   const { error: updateError } = await supabase
     .from("match_results")
-    .update({ status: "inquiry_sent" as const })
+    .update({ status: "reviewed" })
     .eq("id", result.data.matchResultId)
 
   if (updateError) return { error: updateError.message }
@@ -79,25 +93,28 @@ export async function sendInquiry(data: {
 export async function respondToInquiry(
   inquiryId: string,
   action: "accepted" | "declined",
-  data: {
-    response_message?: string
-    decline_reason?: string
-  }
+  message?: string
 ) {
-  const validationResult = respondToInquirySchema.safeParse({ inquiryId, action, data })
+  const validationResult = respondToInquirySchema.safeParse({ inquiryId, action, message })
   if (!validationResult.success) return { error: validationResult.error.issues[0].message }
+
+  if (action === "declined" && !message) {
+    return { error: "A reason is required when declining" }
+  }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }
 
-  if (action === "declined" && !data.decline_reason) {
-    return { error: "Decline reason is required" }
-  }
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("organization_id")
+    .eq("id", user.id)
+    .single()
 
   const { data: inquiry } = await supabase
-    .from("partnership_inquiries")
-    .select("*")
+    .from("inquiries")
+    .select("id, match_result_id, status")
     .eq("id", inquiryId)
     .single()
 
@@ -105,7 +122,7 @@ export async function respondToInquiry(
 
   const { data: matchResult } = await supabase
     .from("match_results")
-    .select("clinic_id")
+    .select("id, clinic_id")
     .eq("id", inquiry.match_result_id)
     .single()
 
@@ -113,33 +130,39 @@ export async function respondToInquiry(
 
   const { data: clinic } = await supabase
     .from("clinics")
-    .select("id, user_id")
+    .select("id, organization_id")
     .eq("id", matchResult.clinic_id)
+    .eq("organization_id", profile?.organization_id ?? "")
     .single()
 
-  if (!clinic || clinic.user_id !== user.id) {
-    return { error: "Not authorized" }
-  }
+  if (!clinic) return { error: "Not authorized" }
 
-  if (inquiry.status !== "pending") {
+  if (inquiry.status !== "open") {
     return { error: "Inquiry has already been responded to" }
   }
 
+  const newInquiryStatus = action === "accepted" ? "in_progress" : "closed"
+  const newMatchStatus = action === "accepted" ? "accepted" : "rejected"
+
   const { error: inquiryError } = await supabase
-    .from("partnership_inquiries")
-    .update({
-      status: action,
-      response_message: data.response_message ?? null,
-      decline_reason: data.decline_reason ?? null,
-      responded_at: new Date().toISOString(),
-    })
+    .from("inquiries")
+    .update({ status: newInquiryStatus })
     .eq("id", inquiryId)
 
   if (inquiryError) return { error: inquiryError.message }
 
+  if (message) {
+    await supabase.from("inquiry_messages").insert({
+      inquiry_id: inquiryId,
+      sender_id: user.id,
+      type: "status_update",
+      content: message,
+    })
+  }
+
   const { error: matchError } = await supabase
     .from("match_results")
-    .update({ status: action })
+    .update({ status: newMatchStatus })
     .eq("id", inquiry.match_result_id)
 
   if (matchError) return { error: matchError.message }
