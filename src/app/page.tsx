@@ -1,31 +1,28 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import Navbar from "@/components/layout/Navbar"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import {
+  Caption,
   LandingHero,
   Heading3,
   Heading5,
   Body,
   BodySmall,
-  Caption,
-} from "@/components/ui/typography"
-import { ClipboardList, Cpu, Handshake } from "lucide-react"
-import { createServerClient } from "@/lib/supabase/server"
+} from "@/components/ui/typography";
+import { ClipboardList, Cpu, Handshake } from "lucide-react";
+import { createServerClient } from "@/lib/supabase/server";
 
-function StatCard({
-  value,
-  label,
-}: {
-  value: string
-  label: string
-}) {
+function StatCard({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-2xl border border-primary bg-surface-level-1 px-6 py-5">
-      <Heading5 className="text-brand">{value}</Heading5>
-      <Caption className="text-center text-secondary">{label}</Caption>
+    <div className="flex items-center gap-4 rounded-2xl border border-primary bg-surface-level-1 px-5 py-4 sm:flex-col sm:items-center sm:gap-1 sm:px-6 sm:py-5">
+      <Heading5 className="shrink-0 text-brand sm:text-center">
+        {value}
+      </Heading5>
+      <Caption className="text-secondary sm:text-center">{label}</Caption>
     </div>
-  )
+  );
 }
 
 function StepCard({
@@ -34,10 +31,10 @@ function StepCard({
   title,
   description,
 }: {
-  step: number
-  icon: React.ReactNode
-  title: string
-  description: string
+  step: number;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
 }) {
   return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-primary bg-surface-level-1 p-6 text-center">
@@ -48,14 +45,21 @@ function StepCard({
       <Heading5>{title}</Heading5>
       <BodySmall className="text-secondary">{description}</BodySmall>
     </div>
-  )
+  );
 }
 
 export default async function Home() {
-  const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const role = user?.user_metadata?.role as string | undefined
-  const homeHref = role === "sponsor" ? "/sponsor/projects" : role === "clinic_admin" ? "/clinic/profile" : null
+  const supabase = await createServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const role = user?.user_metadata?.role as string | undefined;
+  const homeHref =
+    role === "sponsor"
+      ? "/sponsor/projects"
+      : role === "clinic_admin"
+        ? "/clinic/profile"
+        : null;
 
   return (
     <>
@@ -69,9 +73,10 @@ export default async function Home() {
             Match clinics to trials in minutes, not months
           </LandingHero>
           <Body className="mx-auto mb-10 max-w-2xl text-secondary">
-            TrialMatch connects pharmaceutical sponsors with the best-fit research
-            sites using intelligent, criteria-based matching. Stop relying on
-            spreadsheets and phone calls — find the right clinic, faster.
+            TrialMatch connects pharmaceutical sponsors with the best-fit
+            research sites using intelligent, criteria-based matching. Stop
+            relying on spreadsheets and phone calls — find the right clinic,
+            faster.
           </Body>
 
           {/* Dual CTA */}
@@ -99,12 +104,9 @@ export default async function Home() {
       {/* Stats Section */}
       <section className="border-y border-primary bg-subtle px-6 py-16">
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3">
-          <StatCard value="EUR 8M/day" label="Cost of enrollment delays" />
+          <StatCard value="EUR 500K/day" label="Cost of enrollment delays" />
           <StatCard value="19-25%" label="EU trial slots go unfilled" />
-          <StatCard
-            value="EUR 6,500-15,000"
-            label="Per recruited patient"
-          />
+          <StatCard value="EUR 6,500-15,000" label="Per recruited patient" />
         </div>
       </section>
 
@@ -147,7 +149,8 @@ export default async function Home() {
           <Heading3 className="mb-3">For Clinics</Heading3>
           <Body className="mb-8 text-secondary">
             Register your site, showcase your capabilities, and get matched with
-            relevant trials automatically. No cold outreach — sponsors come to you.
+            relevant trials automatically. No cold outreach — sponsors come to
+            you.
           </Body>
           {!user && (
             <Link href="/register?role=clinic_admin">
@@ -180,17 +183,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-primary bg-surface-level-1 px-6 py-8">
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 sm:flex-row">
-          <Caption className="font-display font-semibold text-primary">
-            TrialMatch
-          </Caption>
-          <Caption className="text-tertiary">
-            AUBG Hackathon 2026 — Clinical Trial Site Matching MVP
-          </Caption>
-        </div>
-      </footer>
+      <Footer />
     </>
-  )
+  );
 }
