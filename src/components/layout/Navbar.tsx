@@ -24,36 +24,24 @@ export default async function Navbar() {
           TrialMatch
         </Link>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
           {role === "clinic_admin" ? (
             <>
-              <Link
-                href="/clinic/profile"
-                className="body-small text-secondary hover:text-primary"
-              >
-                My Profile
+              <Link href="/clinic/profile">
+                <Button variant="outline" size="sm">My Profile</Button>
               </Link>
-              <Link
-                href="/clinic/inquiries"
-                className="body-small text-secondary hover:text-primary"
-              >
-                Inquiries
+              <Link href="/clinic/inquiries">
+                <Button variant="outline" size="sm">Inquiries</Button>
               </Link>
             </>
           ) : (
-            <Link
-              href="/clinics"
-              className="body-small hidden text-secondary hover:text-primary sm:block"
-            >
-              Clinics
+            <Link href="/clinics" className="hidden sm:block">
+              <Button variant="outline" size="sm">Clinics</Button>
             </Link>
           )}
           {role === "sponsor" && (
-            <Link
-              href="/sponsor/projects"
-              className="body-small text-secondary hover:text-primary"
-            >
-              My Projects
+            <Link href="/sponsor/projects">
+              <Button variant="outline" size="sm">My Projects</Button>
             </Link>
           )}
 
