@@ -36,7 +36,7 @@ export default async function ProjectDetailPage({
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6">
-        <Link href="/sponsor/projects" className="text-sm text-secondary hover:underline">
+        <Link href="/sponsor/projects" className="text-body-small text-secondary hover:underline">
           ← Back to projects
         </Link>
       </div>

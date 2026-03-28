@@ -31,7 +31,7 @@ export default function AuthFormShell({
     <div className="flex min-h-[calc(100vh-12rem)] items-center justify-center py-10">
       <Card className="w-full max-w-md bg-surface-level-1">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl">{title}</CardTitle>
+          <CardTitle className="text-section-title">{title}</CardTitle>
           <CardDescription>{subtitle}</CardDescription>
         </CardHeader>
         <CardContent>{children}</CardContent>

@@ -2,21 +2,14 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import AuthFormShell from "@/components/common/AuthFormShell"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/typography"
-
-const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-})
-
-type LoginValues = z.infer<typeof loginSchema>
+import { Label, Caption } from "@/components/ui/typography"
+import { loginSchema, type LoginValues } from "@/features/auth/schemas"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -63,7 +56,7 @@ export default function LoginPage() {
             {...register("email")}
           />
           {errors.email && (
-            <p className="text-sm text-icon-status-danger">{errors.email.message}</p>
+            <Caption className="text-icon-status-danger">{errors.email.message}</Caption>
           )}
         </div>
 
@@ -77,7 +70,7 @@ export default function LoginPage() {
             {...register("password")}
           />
           {errors.password && (
-            <p className="text-sm text-icon-status-danger">{errors.password.message}</p>
+            <Caption className="text-icon-status-danger">{errors.password.message}</Caption>
           )}
         </div>
 

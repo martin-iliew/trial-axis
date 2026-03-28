@@ -92,7 +92,7 @@ function ClinicPreviewModal({
                   {clinic.city}, {clinic.country}
                 </Caption>
               </div>
-              <button onClick={onClose} className="text-secondary hover:text-primary text-lg">
+              <button onClick={onClose} className="text-secondary hover:text-primary text-title">
                 &times;
               </button>
             </div>
@@ -187,7 +187,7 @@ export default function MatchResultCard({
       )}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand/10 text-body-small font-bold text-brand">
             {rank}
           </div>
           <div>
@@ -201,7 +201,7 @@ export default function MatchResultCard({
           </div>
         </div>
         <div className="text-right">
-          <span className="text-2xl font-bold text-primary">{matchResult.overall_score}</span>
+          <span className="text-headline font-bold text-primary">{matchResult.overall_score}</span>
           <Caption className="text-secondary">/ 100</Caption>
         </div>
       </div>

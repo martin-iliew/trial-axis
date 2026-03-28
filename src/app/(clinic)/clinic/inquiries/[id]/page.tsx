@@ -45,7 +45,7 @@ export default async function InquiryDetailPage({
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6">
-        <Link href="/clinic/inquiries" className="text-sm text-secondary hover:underline">← Back to inquiries</Link>
+        <Link href="/clinic/inquiries" className="text-body-small text-secondary hover:underline">← Back to inquiries</Link>
       </div>
       <div className="mb-6 flex items-start justify-between">
         <div>

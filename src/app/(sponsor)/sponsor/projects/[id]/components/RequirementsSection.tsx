@@ -76,7 +76,7 @@ export default function RequirementsSection({
         <BodySmall className="font-semibold text-primary">Requirements</BodySmall>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="text-sm text-brand hover:underline"
+          className="text-body-small text-brand hover:underline"
         >
           {showForm ? "Cancel" : "+ Add Requirement"}
         </button>
@@ -90,7 +90,7 @@ export default function RequirementsSection({
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as RequirementType)}
-                className="h-9 w-full rounded-xl border border-primary bg-surface-level-0 px-2 text-sm text-primary focus-visible:outline-none"
+                className="h-9 w-full rounded-xl border border-primary bg-surface-level-0 px-2 text-body-small text-primary focus-visible:outline-none"
               >
                 {requirementTypes.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -114,7 +114,7 @@ export default function RequirementsSection({
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as typeof priority)}
-                className="h-9 w-full rounded-xl border border-primary bg-surface-level-0 px-2 text-sm text-primary focus-visible:outline-none"
+                className="h-9 w-full rounded-xl border border-primary bg-surface-level-0 px-2 text-body-small text-primary focus-visible:outline-none"
               >
                 <option value="required">Required</option>
                 <option value="preferred">Preferred</option>
@@ -146,7 +146,7 @@ export default function RequirementsSection({
               </div>
               <button
                 onClick={() => handleDelete(req.id)}
-                className="text-sm text-secondary hover:text-icon-status-danger"
+                className="text-body-small text-secondary hover:text-icon-status-danger"
               >
                 Remove
               </button>

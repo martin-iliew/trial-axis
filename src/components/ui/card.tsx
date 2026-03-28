@@ -33,7 +33,7 @@ function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "border-t border-primary px-6 py-5 text-sm text-secondary",
+        "border-t border-primary px-6 py-5 text-body-small text-secondary",
         className,
       )}
       {...props}

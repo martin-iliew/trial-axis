@@ -18,22 +18,22 @@ export default async function Navbar() {
   return (
     <nav className="border-b border-primary bg-surface-level-1 px-6 py-4">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
-        <Link href="/" className="font-display text-primary font-semibold text-lg">
+        <Link href="/" className="font-display text-primary font-semibold text-title">
           TrialMatch
         </Link>
 
         <div className="flex items-center gap-4">
           {role === "sponsor" && (
-            <Link href="/sponsor/projects" className="text-sm text-secondary hover:text-primary">
+            <Link href="/sponsor/projects" className="text-body-small text-secondary hover:text-primary">
               My Projects
             </Link>
           )}
           {role === "clinic_admin" && (
             <>
-              <Link href="/clinic/profile" className="text-sm text-secondary hover:text-primary">
+              <Link href="/clinic/profile" className="text-body-small text-secondary hover:text-primary">
                 My Profile
               </Link>
-              <Link href="/clinic/inquiries" className="text-sm text-secondary hover:text-primary">
+              <Link href="/clinic/inquiries" className="text-body-small text-secondary hover:text-primary">
                 Inquiries
               </Link>
             </>

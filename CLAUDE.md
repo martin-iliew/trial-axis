@@ -1,5 +1,3 @@
-@AGENTS.md
-
 # TrialMatch — Project Guide
 
 ## Purpose
@@ -77,7 +75,6 @@ Use this structure as the default organization target. Items marked `[NEW]` need
 ```
 trial-match/
 ├── CLAUDE.md
-├── AGENTS.md
 ├── DESIGN-SYSTEM.md
 ├── package.json
 ├── next.config.ts
@@ -99,29 +96,38 @@ trial-match/
 │   │   │   └── sponsor/
 │   │   │       └── projects/
 │   │   │           ├── page.tsx           ← project list
+│   │   │           ├── new/
+│   │   │           │   ├── page.tsx       ← create project
+│   │   │           │   └── components/    ← new project form
 │   │   │           └── [id]/
 │   │   │               ├── page.tsx       ← project detail
+│   │   │               ├── components/    ← requirements, run match button
 │   │   │               └── matches/
-│   │   │                   └── page.tsx   ← match results
+│   │   │                   ├── page.tsx   ← match results
+│   │   │                   └── components/ ← match result cards
 │   │   ├── (clinic)/                      ← route group: clinic admin pages
 │   │   │   ├── layout.tsx                 ← clinic shell layout
 │   │   │   └── clinic/
-│   │   │       ├── profile/page.tsx       ← clinic profile management
-│   │   │       ├── equipment/page.tsx     ← equipment inventory
-│   │   │       ├── availability/page.tsx  ← availability calendar
-│   │   │       └── inquiries/page.tsx     ← inquiry responses
+│   │   │       ├── profile/
+│   │   │       │   ├── page.tsx           ← clinic profile (tabbed: info, equipment, certs, availability)
+│   │   │       │   └── components/        ← profile tab components
+│   │   │       └── inquiries/
+│   │   │           ├── page.tsx           ← inquiry list
+│   │   │           └── [id]/
+│   │   │               ├── page.tsx       ← inquiry detail + response
+│   │   │               └── components/    ← inquiry response components
 │   │   └── api/                           ← API route handlers
-│   │       └── [...route]/route.ts
+│   │       └── match/route.ts             ← match algorithm endpoint
 │   ├── components/
 │   │   ├── ui/                            ← base reusable primitives, shadcn-style
 │   │   ├── common/                        ← cross-feature composed components
 │   │   └── layout/                        ← nav, shell, header, sidebar, footer
 │   ├── features/                          ← domain modules
-│   │   ├── auth/                          ← login, register, session helpers
-│   │   ├── projects/                      ← trial project CRUD, search
-│   │   ├── clinics/                       ← clinic profile, equipment, availability
-│   │   ├── matching/                      ← match algorithm, results display
-│   │   └── inquiries/                     ← sponsor↔clinic messaging
+│   │   ├── auth/                          ← schemas for login/register forms
+│   │   ├── projects/                      ← trial project queries, actions
+│   │   ├── clinics/                       ← clinic profile queries, actions
+│   │   ├── matching/                      ← match algorithm helpers (future)
+│   │   └── inquiries/                     ← inquiry queries, actions
 │   ├── hooks/                             ← reusable React hooks (client)
 │   ├── lib/
 │   │   ├── utils.ts                       ← cn() and other helpers
@@ -135,10 +141,13 @@ trial-match/
 │   ├── types/
 │   │   ├── index.ts                       ← shared app types (Clinic, TrialProject, etc.)
 │   │   └── supabase.ts                    ← generated Database types
-│   └── config/                            ← environment-aware runtime config
-├── supabase/
-│   ├── migrations/                        ← SQL migration files
-│   └── seed.sql                           ← seed data
+│   ├── config/                            ← environment-aware runtime config
+│   └── supabase/                          ← Supabase project config + migrations
+│       ├── config.toml                    ← Supabase local config
+│       ├── migrations/                    ← SQL migration files
+│       ├── schema.sql                     ← reference schema
+│       ├── seed.sql                       ← seed data
+│       └── seed-auth.ts                   ← auth seed script
 ```
 
 Notes:
@@ -337,7 +346,7 @@ If a semantic token is missing:
 If backend payloads or API contracts change:
 
 - update shared types in `src/types/` first
-- regenerate Supabase types if schema changed: `npx supabase gen types typescript --local > src/types/supabase.ts`
+- regenerate Supabase types if schema changed: `npx supabase gen types typescript --local --workdir src/supabase > src/types/supabase.ts`
 - then update the consumers
 
 If a new visual pattern is needed and no token exists:
@@ -352,32 +361,32 @@ If a new visual pattern is needed and no token exists:
 
 ### Tables
 
-| Table                  | Purpose                                    | Key FKs / Relations                    | RLS                      |
-| ---------------------- | ------------------------------------------ | -------------------------------------- | ------------------------ |
-| `profiles`             | User profile, role, org link               | `id` → `auth.users`                   | Own row only             |
-| `organizations`        | Sponsor or clinic organization             | —                                      | Members only             |
-| `clinics`              | Clinic site details, location, capacity    | `organization_id` → `organizations`   | Owner + matched sponsors |
-| `clinic_equipment`     | Equipment inventory per clinic             | `clinic_id` → `clinics`               | Clinic owner only        |
-| `clinic_availability`  | Availability windows                       | `clinic_id` → `clinics`               | Clinic owner only        |
-| `therapeutic_areas`    | Lookup: oncology, cardiology, etc.         | —                                      | Public read              |
-| `trial_projects`       | Sponsor's trial project definition         | `organization_id` → `organizations`   | Org members              |
-| `project_requirements` | Criteria for a trial project               | `project_id` → `trial_projects`       | Org members              |
-| `match_results`        | Algorithm output: clinic↔project score     | `project_id`, `clinic_id`             | Both parties             |
-| `inquiries`            | Sponsor inquiry to a matched clinic        | `match_result_id` → `match_results`   | Both parties             |
-| `inquiry_messages`     | Messages within an inquiry thread          | `inquiry_id` → `inquiries`            | Thread participants      |
-| `audit_log`            | Immutable action log                       | `user_id` → `profiles`                | Admin only               |
+| Table                    | Purpose                                    | Key FKs / Relations                      | RLS                      |
+| ------------------------ | ------------------------------------------ | ---------------------------------------- | ------------------------ |
+| `profiles`               | User profile, role                         | `id` → `auth.users`                     | Own row only             |
+| `clinics`                | Clinic site details, location, capacity    | `user_id` → `auth.users`                | Owner + matched sponsors |
+| `clinic_specializations` | Clinic↔therapeutic area junction           | `clinic_id` → `clinics`, `therapeutic_area_id` → `therapeutic_areas` | Clinic owner only |
+| `equipment`              | Equipment inventory per clinic             | `clinic_id` → `clinics`                 | Clinic owner only        |
+| `certifications`         | Certification records per clinic           | `clinic_id` → `clinics`                 | Clinic owner only        |
+| `clinic_availability`    | Availability windows + capacity            | `clinic_id` → `clinics`                 | Clinic owner only        |
+| `therapeutic_areas`      | Lookup: oncology, cardiology, etc.         | —                                        | Public read              |
+| `trial_projects`         | Sponsor's trial project definition         | `sponsor_user_id` → `auth.users`        | Owner only               |
+| `trial_requirements`     | Criteria for a trial project               | `trial_project_id` → `trial_projects`   | Owner only               |
+| `match_results`          | Algorithm output: clinic↔project score     | `trial_project_id`, `clinic_id`          | Both parties             |
+| `partnership_inquiries`  | Sponsor inquiry to a matched clinic        | `match_result_id` → `match_results`     | Both parties             |
+| `contact_inquiries`      | Landing page contact form submissions      | —                                        | Public insert            |
 
 ### Enums
 
-`user_role` · `organization_type` · `clinic_status` · `project_status` · `requirement_type` · `match_status` · `inquiry_status` · `message_type` · `equipment_category` · `availability_type`
+`user_role` · `trial_phase` · `molecule_type` · `site_type` · `trial_status` · `requirement_type` · `requirement_priority` · `match_status` · `inquiry_status` · `fda_inspection_outcome`
 
 ### TypeScript Types
 
 Key types exported from `@/types`:
-- `Clinic`, `ClinicEquipment`, `ClinicAvailability`
-- `TrialProject`, `ProjectRequirement`
-- `MatchResult`, `Inquiry`, `InquiryMessage`
-- `Profile`, `Organization`
+- `Clinic`, `TrialProject`, `TrialRequirement`
+- `MatchResult`, `PartnershipInquiry`
+- `TherapeuticArea`, `Profile`
+- `UserRole`, `TrialPhase`, `MoleculeType`, `SiteType`, `TrialStatus`, `InquiryStatus`, `MatchStatus`, `RequirementPriority`, `RequirementType`
 - `Database` (generated, in `@/types/supabase`)
 
 ---

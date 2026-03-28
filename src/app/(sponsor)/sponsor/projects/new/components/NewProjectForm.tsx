@@ -9,7 +9,7 @@ import { createTrialProject } from "@/features/projects/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Label, Heading5 } from "@/components/ui/typography"
+import { Label, Heading5, Caption } from "@/components/ui/typography"
 import type { Tables } from "@/types"
 
 const schema = z.object({
@@ -17,7 +17,7 @@ const schema = z.object({
   description: z.string().optional(),
   therapeutic_area_id: z.string().optional(),
   phase: z.string().optional(),
-  required_patient_count: z.coerce.number().positive().optional().or(z.literal("")),
+  required_patient_count: z.number().positive().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   geographic_preference: z.string().optional(),
@@ -41,9 +41,7 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
       description: values.description || undefined,
       therapeutic_area_id: values.therapeutic_area_id || undefined,
       phase: (values.phase as Parameters<typeof createTrialProject>[0]["phase"]) || undefined,
-      required_patient_count: values.required_patient_count
-        ? Number(values.required_patient_count)
-        : undefined,
+      required_patient_count: values.required_patient_count || undefined,
       start_date: values.start_date || undefined,
       end_date: values.end_date || undefined,
       geographic_preference: values.geographic_preference || undefined,
@@ -69,7 +67,7 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
             {...register("title")}
           />
           {errors.title && (
-            <p className="text-sm text-icon-status-danger">{errors.title.message}</p>
+            <Caption className="text-icon-status-danger">{errors.title.message}</Caption>
           )}
         </div>
 
@@ -87,7 +85,7 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
             <Label htmlFor="therapeutic_area_id">Therapeutic Area</Label>
             <select
               id="therapeutic_area_id"
-              className="h-11 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-sm text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
+              className="h-11 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-body-small text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
               {...register("therapeutic_area_id")}
             >
               <option value="">Select area...</option>
@@ -103,7 +101,7 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
             <Label htmlFor="phase">Phase</Label>
             <select
               id="phase"
-              className="h-11 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-sm text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
+              className="h-11 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-body-small text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
               {...register("phase")}
             >
               <option value="">Select phase...</option>
@@ -123,7 +121,7 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
             type="number"
             min={1}
             placeholder="e.g. 50"
-            {...register("required_patient_count")}
+            {...register("required_patient_count", { valueAsNumber: true })}
           />
         </div>
 

@@ -1,7 +1,12 @@
-import { ReactNode, HTMLAttributes } from "react";
+import { ReactNode, HTMLAttributes, LabelHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 interface TypographyProps extends HTMLAttributes<HTMLElement> {
+  children?: ReactNode;
+  className?: string;
+}
+
+interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   children?: ReactNode;
   className?: string;
 }
@@ -140,7 +145,7 @@ const Small = ({ children, className, ...props }: TypographyProps) => {
   );
 };
 
-const Label = ({ children, className, ...props }: TypographyProps) => {
+const Label = ({ children, className, ...props }: LabelProps) => {
   return (
     <label className={cn("label", className)} {...props}>
       {children}

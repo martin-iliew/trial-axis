@@ -45,7 +45,7 @@ const profileSchema = z.object({
 const equipmentSchema = z.object({
   equipment_type: z.string().min(1, "Type is required"),
   name: z.string().min(1, "Name is required"),
-  quantity: z.coerce.number().min(1),
+  quantity: z.number().min(1),
   is_available: z.boolean(),
 })
 
@@ -58,7 +58,7 @@ const certSchema = z.object({
 const availabilitySchema = z.object({
   available_from: z.string().min(1, "Start date is required"),
   available_to: z.string().min(1, "End date is required"),
-  max_concurrent_trials: z.coerce.number().min(1, "Capacity must be at least 1"),
+  max_concurrent_trials: z.number().min(1, "Capacity must be at least 1"),
 })
 
 function ProfileTab({
@@ -118,7 +118,7 @@ function ProfileTab({
         <Label htmlFor="description">Description</Label>
         <textarea
           id="description"
-          className="h-24 w-full resize-none rounded-xl border border-primary bg-surface-level-0 px-3 py-2 text-sm text-primary placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
+          className="h-24 w-full resize-none rounded-xl border border-primary bg-surface-level-0 px-3 py-2 text-body-small text-primary placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
           placeholder="Brief overview of your clinic…"
           {...register("description")}
         />
@@ -145,7 +145,7 @@ function ProfileTab({
           <Label>Specializations</Label>
           <div className="grid grid-cols-3 gap-2">
             {therapeuticAreas.map((area) => (
-              <label key={area.id} className="flex cursor-pointer items-center gap-2 text-sm">
+              <Label key={area.id} className="flex cursor-pointer items-center gap-2 text-body-small">
                 <input
                   type="checkbox"
                   checked={checkedAreas.has(area.id)}
@@ -158,7 +158,7 @@ function ProfileTab({
                   className="rounded"
                 />
                 {area.name}
-              </label>
+              </Label>
             ))}
           </div>
           {clinic?.id && (
@@ -240,7 +240,7 @@ function EquipmentTab({
               </div>
               <button
                 onClick={() => handleDelete(eq.id)}
-                className="text-xs text-icon-status-danger hover:underline"
+                className="text-caption text-icon-status-danger hover:underline"
               >
                 Remove
               </button>
@@ -266,7 +266,7 @@ function EquipmentTab({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="quantity">Quantity</Label>
-            <Input id="quantity" type="number" min={1} {...register("quantity")} />
+            <Input id="quantity" type="number" min={1} {...register("quantity", { valueAsNumber: true })} />
           </div>
           <div className="flex items-center gap-2 pt-6">
             <input type="checkbox" id="is_available" {...register("is_available")} />
@@ -349,7 +349,7 @@ function CertsAvailabilityTab({
                 </div>
                 <button
                   onClick={() => handleDeleteCert(cert.id)}
-                  className="text-xs text-icon-status-danger hover:underline"
+                  className="text-caption text-icon-status-danger hover:underline"
                 >
                   Remove
                 </button>
@@ -404,7 +404,7 @@ function CertsAvailabilityTab({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="max_concurrent_trials">Patient capacity</Label>
-            <Input id="max_concurrent_trials" type="number" min={1} placeholder="50" {...availForm.register("max_concurrent_trials")} />
+            <Input id="max_concurrent_trials" type="number" min={1} placeholder="50" {...availForm.register("max_concurrent_trials", { valueAsNumber: true })} />
             {availForm.formState.errors.max_concurrent_trials && (
               <Caption className="text-icon-status-danger">{availForm.formState.errors.max_concurrent_trials.message}</Caption>
             )}
@@ -454,7 +454,7 @@ function ProfileCompletion({
       </div>
       <div className="flex flex-wrap gap-2">
         {steps.filter((s) => !s.done).map((s) => (
-          <span key={s.label} className="rounded-full bg-surface-status-warning px-2.5 py-0.5 text-xs text-icon-status-warning">
+          <span key={s.label} className="rounded-full bg-surface-status-warning px-2.5 py-0.5 text-caption text-icon-status-warning">
             {s.label}
           </span>
         ))}
@@ -481,7 +481,7 @@ export default function ClinicProfileTabs({
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+              "-mb-px border-b-2 px-4 py-2.5 text-body-small font-medium transition-colors",
               activeTab === tab
                 ? "border-primary text-primary"
                 : "border-transparent text-secondary hover:text-primary"

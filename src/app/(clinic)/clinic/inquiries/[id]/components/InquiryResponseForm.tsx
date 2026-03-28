@@ -79,7 +79,7 @@ export default function InquiryResponseForm({ inquiryId }: { inquiryId: string }
             type="button"
             variant="outline"
             disabled={loading}
-            className="border-border-status-danger text-icon-status-danger hover:bg-surface-status-danger"
+            className="border-status-danger text-icon-status-danger hover:bg-surface-status-danger"
             onClick={() => {
               if (!showDeclineReason) {
                 setShowDeclineReason(true)
