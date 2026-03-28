@@ -4,7 +4,7 @@ import { getProjectsForSponsor } from "@/features/projects/queries"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Heading5, Body, BodySmall } from "@/components/ui/typography"
+import { Heading5, Heading9, BodySmall } from "@/components/ui/typography"
 
 const statusColors: Record<string, string> = {
   draft: "bg-surface-level-2 text-secondary",
@@ -50,7 +50,7 @@ export default async function ProjectsPage() {
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <Body className="font-semibold">{project.title}</Body>
+                    <Heading9>{project.title}</Heading9>
                     <div className="mt-1 flex items-center gap-2">
                       {area && (
                         <BodySmall className="text-secondary">{area.name}</BodySmall>

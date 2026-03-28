@@ -4,7 +4,7 @@ import { getClinicForUser, getInquiriesForClinic } from "@/features/inquiries/qu
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Heading5, Body, BodySmall, Caption } from "@/components/ui/typography"
+import { Heading5, Heading9, BodySmall, Caption } from "@/components/ui/typography"
 
 const statusColors: Record<string, string> = {
   pending: "bg-surface-status-warning text-icon-status-warning",
@@ -65,7 +65,7 @@ export default async function InquiriesPage() {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <Body className="font-semibold">{trial?.title ?? "Trial Project"}</Body>
+                    <Heading9>{trial?.title ?? "Trial Project"}</Heading9>
                     <div className="mt-1 flex items-center gap-2">
                       {sponsor && (
                         <BodySmall className="text-secondary">From {sponsor.first_name} {sponsor.last_name}</BodySmall>
