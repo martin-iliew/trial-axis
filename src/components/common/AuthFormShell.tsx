@@ -28,7 +28,7 @@ export default function AuthFormShell({
   title,
 }: AuthFormShellProps) {
   return (
-    <div className="flex min-h-[calc(100vh-12rem)] items-center justify-center py-10">
+    <div className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-4 py-10">
       <Card className="w-full max-w-md bg-surface-level-1">
         <CardHeader className="space-y-1">
           <CardTitle className="text-section-title">{title}</CardTitle>
@@ -39,7 +39,7 @@ export default function AuthFormShell({
           <BodySmall>
             {footerLabel}{" "}
             <Link
-              className="font-medium text-primary no-underline hover:text-secondary"
+              className="text-primary no-underline hover:text-secondary"
               href={footerHref}
             >
               {footerCta}
