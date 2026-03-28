@@ -1,176 +1,163 @@
 # TrialMatch MVP Roadmap
 
 ## Phase 1: Domain & Persistence
-**Goal**: Define all entities, DB schema, seed trial data and doctor accounts
+**Goal**: Rename project to TrialMatch, define all entities, DB schema, seed clinic and trial data
 
 ### Tasks
-- [ ] 1.1 Create `Condition` entity in Domain (id, name, category)
-- [ ] 1.2 Create `ClinicalTrial` entity in Domain (title, plainLanguageSummary, description, phase, status, sponsor, start/end dates, minAge, maxAge, gender, location as text string)
-- [ ] 1.3 Create `TrialCondition` join entity linking trials to conditions
-- [ ] 1.4 Create `PatientProfile` entity in Domain (userId, dateOfBirth, gender, city, medicalNotes)
-- [ ] 1.5 Create `PatientCondition` join entity linking patient profiles to conditions
-- [ ] 1.6 Create `DoctorProfile` entity in Domain (userId, clinicName, specialization, city)
-- [ ] 1.7 Create `TrialRequest` entity in Domain (patientId, trialId, doctorId nullable, status enum Pending/Approved/Declined, patientNotes, doctorNote, declineReason, createdAt, updatedAt)
-- [ ] 1.8 Create `ContactInquiry` entity in Domain (name, email, conditionText, trialId, createdAt)
-- [ ] 1.9 Add repository interfaces: `ITrialRepository`, `IConditionRepository`, `IPatientProfileRepository`, `IDoctorProfileRepository`, `ITrialRequestRepository`, `IContactInquiryRepository`
-- [ ] 1.10 Add EF Core configurations for all new entities
-- [ ] 1.11 Implement repositories in Infrastructure
-- [ ] 1.12 Create and run EF migration
-- [ ] 1.13 Build seed data: condition catalog (~30 conditions)
-- [ ] 1.14 Build seed data: 15-20 clinical trials with plain-language summaries and eligibility text
-- [ ] 1.15 Build seed data: 2-3 doctor accounts with profiles
+- [ ] 1.1 Rename all projects from ECommerceWebsite.* to TrialMatch.* (folders, .csproj, namespaces, solution file)
+- [ ] 1.2 Update UserRole enum: remove Customer, add Sponsor and ClinicAdmin roles
+- [ ] 1.3 Add FirstName and LastName to User entity
+- [ ] 1.4 Create `TherapeuticArea` entity (id, name, description)
+- [ ] 1.5 Create `Clinic` entity (id, userId, name, city, address, description, contactEmail, contactPhone, website)
+- [ ] 1.6 Create `ClinicSpecialization` join entity linking clinics to therapeutic areas
+- [ ] 1.7 Create `Equipment` entity (id, clinicId, equipmentType, name, quantity, isAvailable)
+- [ ] 1.8 Create `Certification` entity (id, clinicId, certificationName, issuedBy, validUntil)
+- [ ] 1.9 Create `ClinicAvailability` entity (id, clinicId, availableFrom, availableTo, maxConcurrentTrials, currentTrialCount)
+- [ ] 1.10 Create `TrialProject` entity (id, sponsorUserId, title, description, therapeuticArea, phase, requiredPatientCount, startDate, endDate, geographicPreference, status)
+- [ ] 1.11 Create `TrialRequirement` entity (id, trialProjectId, requirementType, description, value, priority)
+- [ ] 1.12 Create `MatchResult` entity (id, trialProjectId, clinicId, overallScore, breakdown, matchedAt, status)
+- [ ] 1.13 Create `PartnershipInquiry` entity (id, matchResultId, senderUserId, message, status, responseMessage, createdAt, respondedAt)
+- [ ] 1.14 Create `ContactInquiry` entity (id, name, email, organizationType, message, createdAt)
+- [ ] 1.15 Add repository interfaces for all new entities
+- [ ] 1.16 Add EF Core configurations for all entities
+- [ ] 1.17 Implement repositories in Infrastructure
+- [ ] 1.18 Create and run fresh EF migration
+- [ ] 1.19 Build seed data: therapeutic area catalog (~15 areas)
+- [ ] 1.20 Build seed data: 10-15 clinics with specializations, equipment, certifications, availability
+- [ ] 1.21 Build seed data: 3-5 sample trial projects with requirements
+- [ ] 1.22 Build seed data: demo sponsor/CRO and clinic admin accounts
+- [ ] 1.23 Update shared TypeScript contracts (roles, user types)
 
-**Covers**: R1, R2
+**Covers**: R1, R2, R9
 
 ---
 
-## Phase 2: Backend Use Cases — Trials & Profiles
-**Goal**: Implement API endpoints for profiles, trials, conditions, and doctor profiles
+## Phase 2: Backend Use Cases -- Clinic Profile
+**Goal**: Implement API endpoints for clinic profile management
 
 ### Tasks
-- [ ] 2.1 Create `GetTrialsQuery` (list with pagination, filtering by condition/phase/status, keyword search with condition autocomplete support)
-- [ ] 2.2 Create `GetTrialByIdQuery` (single trial with conditions and plain-language summary)
-- [ ] 2.3 Create `SearchConditionsQuery` (autocomplete search for condition names)
-- [ ] 2.4 Create `CreatePatientProfileCommand` (validate + persist profile)
-- [ ] 2.5 Create `UpdatePatientProfileCommand` (update existing profile)
-- [ ] 2.6 Create `GetPatientProfileQuery` (fetch current user's profile)
-- [ ] 2.7 Create `GetConditionsQuery` (list all conditions for multi-select)
-- [ ] 2.8 Create `CreateDoctorProfileCommand` (validate + persist doctor profile on registration)
-- [ ] 2.9 Create `SearchDoctorsQuery` (search doctors by name/clinic for "Send to GP" feature)
-- [ ] 2.10 Add request DTOs and validators for all commands
-- [ ] 2.11 Add response DTOs for trials, profiles, conditions, doctors
-- [ ] 2.12 Create `TrialsController` with endpoints: GET /api/trials, GET /api/trials/{id}
-- [ ] 2.13 Create `ProfileController` with endpoints: GET/POST/PUT /api/profile
-- [ ] 2.14 Create `ConditionsController` with endpoints: GET /api/conditions, GET /api/conditions/search?q=
-- [ ] 2.15 Create `DoctorsController` with endpoint: GET /api/doctors/search?q=
-- [ ] 2.16 Register all new services in DI
+- [ ] 2.1 Create `CreateClinicProfileCommand` (validate + persist clinic)
+- [ ] 2.2 Create `UpdateClinicProfileCommand`
+- [ ] 2.3 Create `GetClinicProfileQuery` (current user's clinic)
+- [ ] 2.4 Create `AddEquipmentCommand` / `RemoveEquipmentCommand` / `UpdateEquipmentCommand`
+- [ ] 2.5 Create `AddCertificationCommand` / `RemoveCertificationCommand`
+- [ ] 2.6 Create `SetClinicAvailabilityCommand`
+- [ ] 2.7 Create `GetTherapeuticAreasQuery` (list all for multi-select)
+- [ ] 2.8 Create `ClinicController` with endpoints
+- [ ] 2.9 Add request/response DTOs and validators
 
-**Covers**: R3 (backend), R4 (backend), R7.1, R7.2
+**Covers**: R3
 
 ---
 
-## Phase 3: Backend Use Cases — Requests & Contact
-**Goal**: Implement participation requests, doctor approval workflow, and contact form
+## Phase 3: Backend Use Cases -- Trial Projects
+**Goal**: Implement API endpoints for trial project creation and management
 
 ### Tasks
-- [ ] 3.1 Create `SubmitTrialRequestCommand` (patient submits request, optionally linked to a doctor)
-- [ ] 3.2 Create `GetPatientRequestsQuery` (patient's own requests with status)
-- [ ] 3.3 Create `GetDoctorRequestsQuery` (all requests sent to a doctor, filterable by status)
-- [ ] 3.4 Create `GetRequestByIdQuery` (full request detail with patient + trial info)
-- [ ] 3.5 Create `ApproveRequestCommand` (doctor approves, optional note)
-- [ ] 3.6 Create `DeclineRequestCommand` (doctor declines, required reason)
-- [ ] 3.7 Create `SubmitContactInquiryCommand` (non-logged-in contact form submission)
-- [ ] 3.8 Add request DTOs and validators
-- [ ] 3.9 Add response DTOs for requests and contact inquiries
-- [ ] 3.10 Create `RequestsController` with endpoints:
-  - POST /api/requests (submit)
-  - GET /api/requests/mine (patient's requests)
-  - GET /api/requests/inbox (doctor's requests)
-  - GET /api/requests/{id} (detail)
-  - PUT /api/requests/{id}/approve
-  - PUT /api/requests/{id}/decline
-- [ ] 3.11 Create `ContactController` with endpoint: POST /api/contact
-- [ ] 3.12 Register all new services in DI
+- [ ] 3.1 Create `CreateTrialProjectCommand` (validate + persist)
+- [ ] 3.2 Create `UpdateTrialProjectCommand`
+- [ ] 3.3 Create `GetTrialProjectQuery` (single project with requirements)
+- [ ] 3.4 Create `GetMyTrialProjectsQuery` (sponsor's projects list)
+- [ ] 3.5 Create `AddTrialRequirementCommand` / `RemoveTrialRequirementCommand`
+- [ ] 3.6 Create `TrialProjectsController` with endpoints
+- [ ] 3.7 Add request/response DTOs and validators
 
-**Covers**: R5, R6, R7.3–R7.8
+**Covers**: R4
 
 ---
 
-## Phase 4: Backend — PDF Generation
-**Goal**: Generate downloadable one-page trial summary PDF
+## Phase 4: Matching Algorithm
+**Goal**: Implement the rule-based matching engine
 
 ### Tasks
-- [ ] 4.1 Add PDF generation library (e.g., QuestPDF or iTextSharp)
-- [ ] 4.2 Create `GenerateTrialPdfQuery` (takes trialId, returns PDF bytes)
-- [ ] 4.3 PDF layout: trial title, plain-language summary, eligibility criteria, location, sponsor, contact info
-- [ ] 4.4 Add endpoint to `TrialsController`: GET /api/trials/{id}/pdf
-- [ ] 4.5 Test PDF output with seed data
+- [ ] 4.1 Create `IMatchingService` interface in Application layer
+- [ ] 4.2 Implement `MatchingService` with weighted scoring:
+  - Therapeutic area match (hard filter + score)
+  - Equipment availability (Required = hard filter, Preferred/NiceToHave = weighted)
+  - Certification compliance (Required = hard filter)
+  - Capacity and availability window overlap
+  - Geographic preference (city text match)
+- [ ] 4.3 Create `RunMatchingCommand` (takes trialProjectId, runs algorithm, persists results)
+- [ ] 4.4 Create `GetMatchResultsQuery` (ranked results for a trial project)
+- [ ] 4.5 Create `GetMatchResultDetailQuery` (single match with clinic profile and score breakdown)
+- [ ] 4.6 Create `MatchingController` with endpoints
+- [ ] 4.7 Add DTOs for match results with score breakdown
+
+**Covers**: R5
+
+---
+
+## Phase 5: Backend Use Cases -- Partnership Inquiries & Contact
+**Goal**: Implement inquiry workflow between sponsors and clinics
+
+### Tasks
+- [ ] 5.1 Create `SendPartnershipInquiryCommand` (sponsor sends to clinic from match result)
+- [ ] 5.2 Create `GetClinicInquiriesQuery` (clinic's incoming inquiries)
+- [ ] 5.3 Create `GetSponsorInquiriesQuery` (sponsor's outgoing inquiries for a trial)
+- [ ] 5.4 Create `AcceptInquiryCommand` (clinic accepts with optional message)
+- [ ] 5.5 Create `DeclineInquiryCommand` (clinic declines with reason)
+- [ ] 5.6 Create `SubmitContactInquiryCommand` (visitor contact form)
+- [ ] 5.7 Create `InquiriesController` and `ContactController` with endpoints
+- [ ] 5.8 Add DTOs and validators
+
+**Covers**: R6, R7
+
+---
+
+## Phase 6: Shared Contracts
+**Goal**: Add TypeScript types, routes, and services for all endpoints
+
+### Tasks
+- [ ] 6.1 Add all entity types to `shared/api-types`
+- [ ] 6.2 Add all endpoint routes to `shared/constants`
+- [ ] 6.3 Add service wrappers for clinic, trial project, matching, inquiry, and contact endpoints
 
 **Covers**: R8
 
 ---
 
-## Phase 5: Shared Contracts
-**Goal**: Add TypeScript types, routes, and services for all endpoints
+## Phase 7: Web -- Clinic Admin Views
+**Goal**: Build clinic profile management UI
 
 ### Tasks
-- [ ] 5.1 Add trial-related types to `shared/api-types` (Trial, Condition, PatientProfile, DoctorProfile, TrialRequest, ContactInquiry)
-- [ ] 5.2 Add all endpoint routes to `shared/constants`
-- [ ] 5.3 Add `trialService` to `shared/services` (getTrials, getTrialById, getConditions, searchConditions, downloadTrialPdf)
-- [ ] 5.4 Add `profileService` to `shared/services` (getProfile, createProfile, updateProfile)
-- [ ] 5.5 Add `doctorService` to `shared/services` (searchDoctors)
-- [ ] 5.6 Add `requestService` to `shared/services` (submitRequest, getMyRequests, getDoctorInbox, getRequestById, approveRequest, declineRequest)
-- [ ] 5.7 Add `contactService` to `shared/services` (submitInquiry)
+- [ ] 7.1 Create clinic profile page at `/clinic/profile`
+- [ ] 7.2 Clinic profile form (name, city, address, contact info, description)
+- [ ] 7.3 Specialization multi-select (therapeutic areas)
+- [ ] 7.4 Equipment inventory management (add/remove/toggle availability)
+- [ ] 7.5 Certification management (add/remove)
+- [ ] 7.6 Availability and capacity settings
+- [ ] 7.7 Clinic inquiry inbox at `/clinic/inquiries`
+- [ ] 7.8 Accept/decline inquiry workflow
 
-**Covers**: R9
+**Covers**: R3 (frontend), R6 (frontend)
 
 ---
 
-## Phase 6: Web — Patient Profile
-**Goal**: Build the patient profile creation/edit form
+## Phase 8: Web -- Sponsor/CRO Views
+**Goal**: Build trial project creation and match results UI
 
 ### Tasks
-- [ ] 6.1 Create profile page at `/profile`
-- [ ] 6.2 Build profile form with React Hook Form + Zod validation
-- [ ] 6.3 Condition multi-select component (fetches from /api/conditions)
-- [ ] 6.4 Date of birth, gender, and city (text input) fields
-- [ ] 6.5 React Query mutations for create/update profile
-- [ ] 6.6 Show success/error feedback
-- [ ] 6.7 Add profile link to navigation/layout
+- [ ] 8.1 Create trial project form at `/projects/new`
+- [ ] 8.2 Project detail page at `/projects/:id` with requirements management
+- [ ] 8.3 "Find Matching Clinics" button triggers matching algorithm
+- [ ] 8.4 Match results page showing ranked clinics with scores and breakdowns
+- [ ] 8.5 Clinic profile preview from match results
+- [ ] 8.6 "Send Inquiry" button from match results
+- [ ] 8.7 My projects list at `/projects`
+- [ ] 8.8 Inquiry status tracking on project page
 
-**Covers**: R3 (frontend)
+**Covers**: R4 (frontend), R5 (frontend), R6 (frontend)
 
 ---
 
-## Phase 7: Web — Trial Browsing & Detail
-**Goal**: Build trial listing and detail pages with role-aware actions
+## Phase 9: Web -- Landing & Public Pages
+**Goal**: Build landing page and visitor contact form
 
 ### Tasks
-- [ ] 7.1 Create trials listing page at `/trials`
-- [ ] 7.2 Trial card component showing title, phase, status, conditions, location, age range
-- [ ] 7.3 Filter bar: condition dropdown, phase selector, status toggle
-- [ ] 7.4 Smart keyword search input with condition autocomplete
-- [ ] 7.5 Pagination controls
-- [ ] 7.6 Create trial detail page at `/trials/:id`
-- [ ] 7.7 Detail page shows: plain-language summary, eligibility criteria ("You may qualify if..."), location text, phase, sponsor, status
-- [ ] 7.8 Action buttons (logged-in patient): "Apply to This Trial", "Send to My Doctor", "Download PDF"
-- [ ] 7.9 Action buttons (not logged in): "Interested? Contact Us" → contact form modal
-- [ ] 7.10 Contact form modal: name, email, condition (free text), submit → POST /api/contact
-- [ ] 7.11 "Download PDF" button → fetches /api/trials/{id}/pdf and triggers browser download
-- [ ] 7.12 Add trials link to navigation
-
-**Covers**: R4 (frontend), R6 (frontend), R8 (frontend)
-
----
-
-## Phase 8: Web — Requests & Send to Doctor
-**Goal**: Build request submission, doctor search, and patient request tracking
-
-### Tasks
-- [ ] 8.1 "Apply to This Trial" button → request form modal (preferred site, notes) → POST /api/requests (no doctorId)
-- [ ] 8.2 "Send to My Doctor" button → doctor search modal (search by name/clinic) → select doctor → POST /api/requests (with doctorId)
-- [ ] 8.3 Create "My Requests" page at `/requests` for patients
-- [ ] 8.4 Request list with status badges (Pending / Approved / Declined)
-- [ ] 8.5 Click request → expanded detail showing trial info, status, doctor notes/decline reason
-- [ ] 8.6 Add "My Requests" link to patient navigation
-
-**Covers**: R5 (frontend)
-
----
-
-## Phase 9: Web — Doctor Views
-**Goal**: Build doctor request inbox with approve/decline workflow
-
-### Tasks
-- [ ] 9.1 Add doctor role guard / route protection
-- [ ] 9.2 Create doctor request inbox at `/doctor/requests`
-- [ ] 9.3 Tabbed view: Pending (default), Approved, Declined, All
-- [ ] 9.4 Request list showing: patient name, trial name, condition, date submitted
-- [ ] 9.5 Click request → full detail: patient info, trial info, patient notes, eligibility summary
-- [ ] 9.6 "Approve" button with optional note field
-- [ ] 9.7 "Decline" button with required reason field
-- [ ] 9.8 Status update reflects immediately in the list
-- [ ] 9.9 Add doctor navigation (inbox link with pending count badge)
+- [ ] 9.1 Landing page explaining the platform value proposition
+- [ ] 9.2 Browse clinics page (limited public view)
+- [ ] 9.3 Contact form for visitors interested in joining
+- [ ] 9.4 Role-aware navigation (Sponsor vs ClinicAdmin vs visitor)
 
 **Covers**: R7 (frontend)
 
@@ -180,12 +167,10 @@
 **Goal**: Final integration, visual polish, demo readiness
 
 ### Tasks
-- [ ] 10.1 End-to-end flow test: register → profile → browse → trial detail → apply → doctor approves
-- [ ] 10.2 End-to-end flow test: visitor → browse → contact form
-- [ ] 10.3 End-to-end flow test: patient → send to doctor → doctor approves/declines
+- [ ] 10.1 E2E flow: Sponsor creates project -> adds requirements -> runs matching -> views results -> sends inquiry -> clinic accepts
+- [ ] 10.2 E2E flow: Clinic admin registers -> fills profile -> adds equipment/certs -> receives and responds to inquiry
+- [ ] 10.3 E2E flow: Visitor browses clinics -> submits contact form
 - [ ] 10.4 Navigation refinement (role-aware nav, active states)
-- [ ] 10.5 Loading states and skeleton screens
-- [ ] 10.6 Error handling for API failures
-- [ ] 10.7 Responsive layout check
-- [ ] 10.8 Demo seed data validation (realistic and diverse)
-- [ ] 10.9 PDF output review
+- [ ] 10.5 Loading states and error handling
+- [ ] 10.6 Responsive layout check
+- [ ] 10.7 Demo seed data validation

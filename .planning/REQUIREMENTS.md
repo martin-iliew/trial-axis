@@ -1,64 +1,65 @@
 # TrialMatch MVP Requirements
 
 ## R1: Domain Model
-- **R1.1** Define `ClinicalTrial` entity with: title, plainLanguageSummary, description, phase, status, conditions targeted, eligibility criteria (age range, gender), sponsor, location (text, e.g., "Sofia", "Berlin"), start/end dates
-- **R1.2** Define `PatientProfile` entity linked to `User`: conditions, date of birth, gender, location (city text), medical history notes
-- **R1.3** Define `Condition` entity (medical condition catalog) used by both trials and patient profiles
-- **R1.4** Define `TrialRequest` entity linking a patient to a trial: status (Pending/Approved/Declined), doctorId (nullable -- null for direct requests), doctorNote, declineReason, createdAt
-- **R1.5** Define `ContactInquiry` entity for non-logged-in users: name, email, condition (free text), trialId, createdAt
-- **R1.6** Define `DoctorProfile` entity linked to `User` (doctor role): clinicName, specialization, city
+- **R1.1** Define `Clinic` entity: name, city, address, description, contactEmail, contactPhone, website
+- **R1.2** Define `ClinicSpecialization` entity linking clinics to therapeutic areas they handle (oncology, cardiology, neurology, etc.)
+- **R1.3** Define `Equipment` entity linked to a clinic: equipmentType (enum or catalog), name, quantity, isAvailable
+- **R1.4** Define `ClinicAvailability` entity: clinic reference, availableFrom, availableTo, maxConcurrentTrials, currentTrialCount
+- **R1.5** Define `TrialProject` entity: title, description, therapeuticArea, phase (Phase1-Phase4), sponsorOrganization, requiredPatientCount, startDate, endDate, geographicPreference (city/region text), status (Draft/Searching/Matched/InProgress/Completed)
+- **R1.6** Define `TrialRequirement` entity linked to a trial project: requirementType (Equipment/Certification/Specialization/Capacity), description, value, priority (Required/Preferred/NiceToHave)
+- **R1.7** Define `MatchResult` entity: trialProjectId, clinicId, overallScore (0-100), breakdown (JSON or related scores), matchedAt, status (Pending/Reviewed/InquirySent/Accepted/Declined)
+- **R1.8** Define `PartnershipInquiry` entity: matchResultId, senderUserId, message, status (Pending/Accepted/Declined), responseMessage, createdAt, respondedAt
+- **R1.9** Define `ContactInquiry` entity for non-logged-in visitors: name, email, organizationType (Clinic/Sponsor/Other), message, createdAt
+- **R1.10** Define `TherapeuticArea` catalog entity: name, description (used by both clinics and trial projects)
+- **R1.11** Define `Certification` entity linked to a clinic: certificationName, issuedBy, validUntil (e.g., GCP, ISO, ethics board approval)
 
-## R2: Trial Data & Seeding
-- **R2.1** Seed database with 15-20 realistic clinical trials across various conditions (diabetes, hypertension, asthma, oncology, cardiology, etc.)
-- **R2.2** Seed a condition catalog (simplified list)
-- **R2.3** Trials must have varied eligibility criteria to demonstrate meaningful matching
-- **R2.4** Each trial must have a plain-language summary and "You may qualify if..." eligibility text (pre-written in seed data)
-- **R2.5** Seed 2-3 doctor accounts for demo purposes
+## R2: Seed Data
+- **R2.1** Seed 10-15 clinics across Bulgarian cities (Sofia, Plovdiv, Varna, Burgas, Stara Zagora) with varied specializations and equipment
+- **R2.2** Seed a therapeutic area catalog (~15 areas: Oncology, Cardiology, Neurology, Endocrinology, Pulmonology, Rheumatology, Gastroenterology, Dermatology, Psychiatry, Ophthalmology, Immunology, Infectious Disease, Orthopedics, Hematology, Nephrology)
+- **R2.3** Seed equipment types: MRI, CT Scanner, PET Scanner, Ultrasound, ECG, Spirometer, Lab (basic), Lab (advanced), Biobank Storage, Patient Monitoring System, Infusion Pump, etc.
+- **R2.4** Seed 3-5 sample trial projects with varied requirements to demonstrate matching
+- **R2.5** Seed 2-3 sponsor/CRO accounts and 3-4 clinic admin accounts for demo
+- **R2.6** Seed certifications for clinics (GCP, ISO 9001, local ethics board approval)
 
-## R3: Patient Profile
-- **R3.1** Authenticated user can create/update their patient profile
-- **R3.2** Profile form captures: conditions (multi-select from catalog), date of birth, gender, location (city text)
-- **R3.3** Profile data persists and is editable
-- **R3.4** Backend validates profile completeness before allowing requests
+## R3: Clinic Profile Management
+- **R3.1** Clinic admin can create/update their clinic profile
+- **R3.2** Clinic admin can manage equipment inventory (add/remove/update availability)
+- **R3.3** Clinic admin can set specializations (multi-select from therapeutic area catalog)
+- **R3.4** Clinic admin can manage certifications
+- **R3.5** Clinic admin can set availability windows and capacity
 
-## R4: Trial Browsing & Search
-- **R4.1** List all active clinical trials with pagination
-- **R4.2** Filter trials by condition, phase, and status
-- **R4.3** Smart keyword search with condition autocomplete (search by title, description, condition names)
-- **R4.4** View full trial details on a dedicated page: plain-language summary, eligibility criteria, location (text), phase, sponsor, status
-- **R4.5** Trial detail page shows action buttons based on auth state:
-  - Logged in (patient): "Apply to This Trial" + "Send to My Doctor" + "Download PDF"
-  - Not logged in: "Interested? Contact Us" (contact form)
+## R4: Trial Project Management
+- **R4.1** Sponsor/CRO can create a trial project with basic info (title, description, therapeutic area, phase, timeline, patient count, geographic preference)
+- **R4.2** Sponsor/CRO can add requirements to a trial project (equipment, certifications, specializations, capacity)
+- **R4.3** Each requirement has a priority level: Required, Preferred, NiceToHave
+- **R4.4** Sponsor/CRO can view and edit their trial projects
 
-## R5: Participation Requests (Logged-in Patients)
-- **R5.1** Patient can submit a participation request for a trial (direct request -- no doctor involved)
-- **R5.2** Patient can send a trial to a doctor: search for registered doctors by name/clinic, select one, submit request linked to that doctor
-- **R5.3** Request captures: patient profile snapshot, trial reference, preferred site (if multiple), optional notes
-- **R5.4** Request status flow: Pending → Approved / Declined
-- **R5.5** Patient can view all their submitted requests with status badges on a "My Requests" page
+## R5: Matching Algorithm
+- **R5.1** Rule-based weighted scoring algorithm that matches a trial project to registered clinics
+- **R5.2** Scoring dimensions: therapeutic area match, equipment availability, certification compliance, capacity/availability, geographic proximity (city match), past experience (specialization count)
+- **R5.3** Required criteria are hard filters -- clinic is excluded if any Required criterion is unmet
+- **R5.4** Preferred and NiceToHave criteria contribute to the score with different weights
+- **R5.5** Results are ranked by overall score (0-100) with per-dimension breakdown
+- **R5.6** Match results are persisted and viewable by the sponsor/CRO
 
-## R6: Contact Form (Non-logged-in Visitors)
-- **R6.1** Visitors can fill out a contact form on the trial detail page
-- **R6.2** Form captures: name, email, condition (free text), trial reference
-- **R6.3** Submission is stored as a `ContactInquiry` -- no status tracking, no login required
-- **R6.4** Show confirmation message after submission
+## R6: Partnership Inquiries
+- **R6.1** Sponsor/CRO can send a partnership inquiry to a matched clinic from the match results page
+- **R6.2** Inquiry includes a message from the sponsor
+- **R6.3** Clinic admin sees incoming inquiries in their inbox
+- **R6.4** Clinic admin can accept (with optional message) or decline (with reason)
+- **R6.5** Sponsor/CRO can track inquiry status on their trial project page
 
-## R7: Doctor Role
-- **R7.1** Doctors register with doctor role and create a doctor profile (clinic name, specialization, city)
-- **R7.2** Doctor profile is searchable by patients when sending a trial to a doctor
-- **R7.3** Doctor has a request inbox showing all requests sent to them
-- **R7.4** Request inbox has tabs: Pending, Approved, Declined, All
-- **R7.5** Doctor can view full request details: patient info, trial info, patient notes
-- **R7.6** Doctor can approve a request (with optional note to patient)
-- **R7.7** Doctor can decline a request (with required reason)
-- **R7.8** Patient is notified of status change (visible on their "My Requests" page)
+## R7: Contact Form (Visitors)
+- **R7.1** Non-logged-in visitors can submit a contact form (name, email, organization type, message)
+- **R7.2** Stored as ContactInquiry -- no status tracking, no login required
+- **R7.3** Confirmation shown after submission
 
-## R8: Send to GP / PDF Generation
-- **R8.1** "Send to My Doctor" button on trial detail page opens doctor search + sends request to selected doctor
-- **R8.2** "Download PDF" button generates a one-page trial summary PDF: trial title, plain-language summary, eligibility criteria, location, sponsor, PI contact info
-- **R8.3** PDF is downloadable by the patient to bring to an in-person appointment
+## R8: Shared Contracts
+- **R8.1** Add all API types to `shared/api-types` (Clinic, TrialProject, TrialRequirement, MatchResult, PartnershipInquiry, etc.)
+- **R8.2** Add all endpoint routes to `shared/constants`
+- **R8.3** Add service wrappers to `shared/services` for all new endpoints
 
-## R9: Shared Contracts
-- **R9.1** Add trial-related API types to `shared/api-types` (Trial, Condition, PatientProfile, TrialRequest, ContactInquiry, DoctorProfile)
-- **R9.2** Add all endpoint routes to `shared/constants`
-- **R9.3** Add service wrappers to `shared/services` for all new endpoints
+## R9: Roles & Auth Updates
+- **R9.1** UserRole enum: Patient removed, add Sponsor and ClinicAdmin roles
+- **R9.2** Role is selected at registration (Sponsor or ClinicAdmin)
+- **R9.3** Role-based route protection on frontend and backend
