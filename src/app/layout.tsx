@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SmoothScrolling from "@/components/common/smooth-scrolling";
 import { mpexSans, mpexSansRounded } from "@/lib/fonts";
+import { Providers } from "@/lib/providers";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "TrialMatch — Clinical Trial Site Matching",
@@ -20,7 +22,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-default text-primary antialiased">
-        <SmoothScrolling>{children}</SmoothScrolling>
+        <Providers>
+          <SmoothScrolling>{children}</SmoothScrolling>
+        </Providers>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );
