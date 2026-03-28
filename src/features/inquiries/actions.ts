@@ -1,13 +1,32 @@
 "use server"
 
+import { z } from "zod"
 import { createServerClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+
+const sendInquirySchema = z.object({
+  matchResultId: z.string().min(1, "Match result ID is required"),
+  message: z.string().min(1, "Message is required"),
+  notes: z.string().optional(),
+})
+
+const respondToInquirySchema = z.object({
+  inquiryId: z.string().min(1, "Inquiry ID is required"),
+  action: z.enum(["accepted", "declined"]),
+  data: z.object({
+    response_message: z.string().optional(),
+    decline_reason: z.string().optional(),
+  }),
+})
 
 export async function sendInquiry(data: {
   matchResultId: string
   message: string
   notes?: string
 }) {
+  const result = sendInquirySchema.safeParse(data)
+  if (!result.success) return { error: result.error.issues[0].message }
+
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }
@@ -15,7 +34,7 @@ export async function sendInquiry(data: {
   const { data: matchResult } = await supabase
     .from("match_results")
     .select("*")
-    .eq("id", data.matchResultId)
+    .eq("id", result.data.matchResultId)
     .single()
 
   if (!matchResult) return { error: "Match result not found" }
@@ -37,10 +56,10 @@ export async function sendInquiry(data: {
   const { error: insertError } = await supabase
     .from("partnership_inquiries")
     .insert({
-      match_result_id: data.matchResultId,
+      match_result_id: result.data.matchResultId,
       sender_user_id: user.id,
-      message: data.message,
-      notes: data.notes ?? null,
+      message: result.data.message,
+      notes: result.data.notes ?? null,
       status: "pending" as const,
     })
 
@@ -49,7 +68,7 @@ export async function sendInquiry(data: {
   const { error: updateError } = await supabase
     .from("match_results")
     .update({ status: "inquiry_sent" as const })
-    .eq("id", data.matchResultId)
+    .eq("id", result.data.matchResultId)
 
   if (updateError) return { error: updateError.message }
 
@@ -65,6 +84,9 @@ export async function respondToInquiry(
     decline_reason?: string
   }
 ) {
+  const validationResult = respondToInquirySchema.safeParse({ inquiryId, action, data })
+  if (!validationResult.success) return { error: validationResult.error.issues[0].message }
+
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }

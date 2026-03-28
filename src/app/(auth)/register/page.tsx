@@ -2,25 +2,15 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import AuthFormShell from "@/components/common/AuthFormShell"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/typography"
+import { Label, Caption } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
-
-const registerSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["sponsor", "clinic_admin"]),
-})
-
-type RegisterValues = z.infer<typeof registerSchema>
+import { registerSchema, type RegisterValues } from "@/features/auth/schemas"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -94,7 +84,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => setValue("role", r)}
                 className={cn(
-                  "rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors",
+                  "rounded-xl border px-4 py-2.5 text-body-small font-medium transition-colors",
                   selectedRole === r
                     ? "border-primary bg-surface-level-2 text-primary"
                     : "border-primary/30 text-secondary hover:border-primary"
@@ -105,7 +95,7 @@ export default function RegisterPage() {
             ))}
           </div>
           {errors.role && (
-            <p className="text-sm text-icon-status-danger">{errors.role.message}</p>
+            <Caption className="text-icon-status-danger">{errors.role.message}</Caption>
           )}
         </div>
 
@@ -115,14 +105,14 @@ export default function RegisterPage() {
             <Label htmlFor="firstName">First name</Label>
             <Input id="firstName" placeholder="Alex" {...register("firstName")} />
             {errors.firstName && (
-              <p className="text-sm text-icon-status-danger">{errors.firstName.message}</p>
+              <Caption className="text-icon-status-danger">{errors.firstName.message}</Caption>
             )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="lastName">Last name</Label>
             <Input id="lastName" placeholder="Smith" {...register("lastName")} />
             {errors.lastName && (
-              <p className="text-sm text-icon-status-danger">{errors.lastName.message}</p>
+              <Caption className="text-icon-status-danger">{errors.lastName.message}</Caption>
             )}
           </div>
         </div>
@@ -137,7 +127,7 @@ export default function RegisterPage() {
             {...register("email")}
           />
           {errors.email && (
-            <p className="text-sm text-icon-status-danger">{errors.email.message}</p>
+            <Caption className="text-icon-status-danger">{errors.email.message}</Caption>
           )}
         </div>
 
@@ -151,7 +141,7 @@ export default function RegisterPage() {
             {...register("password")}
           />
           {errors.password && (
-            <p className="text-sm text-icon-status-danger">{errors.password.message}</p>
+            <Caption className="text-icon-status-danger">{errors.password.message}</Caption>
           )}
         </div>
 
