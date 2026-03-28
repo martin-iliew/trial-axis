@@ -47,9 +47,15 @@ export default function RegisterPage() {
       return
     }
 
-    toast.success("Account created! Signing you in…")
-    router.push(values.role === "sponsor" ? "/sponsor/projects" : "/clinic/profile")
+    if (!data.session) {
+      toast.success("Account created! Check your email to confirm before signing in.")
+      router.push("/login")
+      return
+    }
+
+    toast.success("Account created!")
     router.refresh()
+    router.push(values.role === "sponsor" ? "/sponsor/projects" : "/clinic/profile")
   }
 
   return (

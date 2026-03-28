@@ -5,9 +5,9 @@ import { Body } from "@/components/ui/typography"
 
 export default function Error({ reset }: { error: Error; reset: () => void }) {
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8 text-center">
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col items-center justify-center gap-4">
       <Body className="text-secondary">Failed to load projects.</Body>
-      <Button variant="outline" onClick={reset} className="mt-4">Try again</Button>
+      <Button variant="outline" onClick={reset}>Try again</Button>
     </div>
   )
 }

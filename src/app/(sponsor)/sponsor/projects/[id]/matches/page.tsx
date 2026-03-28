@@ -37,7 +37,7 @@ export default async function MatchResultsPage({
       <div className="mb-6">
         <Link
           href={`/sponsor/projects/${id}`}
-          className="text-body-small text-secondary hover:underline"
+          className="body-small text-secondary hover:underline"
         >
           ← Back to project
         </Link>

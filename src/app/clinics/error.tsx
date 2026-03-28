@@ -1,16 +1,19 @@
-"use client"
+"use client";
 
-import { Body, BodySmall } from "@/components/ui/typography"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Heading7, BodySmall } from "@/components/ui/typography";
+import { Button } from "@/components/ui/button";
 
-export default function ClinicsError({ reset }: { reset: () => void }) {
+export default function ClinicsError() {
   return (
-    <div className="container mx-auto flex max-w-4xl flex-col items-center gap-4 px-4 py-20 text-center">
-      <Body className="text-secondary">Something went wrong loading clinics.</Body>
-      <BodySmall className="text-tertiary">Please try again.</BodySmall>
-      <Button variant="outline" onClick={reset}>
-        Retry
-      </Button>
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col items-center justify-center gap-4">
+      <Heading7 className="text-secondary">Failed to load clinics</Heading7>
+      <BodySmall className="text-tertiary">
+        There was a problem fetching the clinic list.
+      </BodySmall>
+      <Link href="/">
+        <Button variant="outline">Go home</Button>
+      </Link>
     </div>
-  )
+  );
 }

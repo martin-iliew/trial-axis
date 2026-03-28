@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Label, BodySmall, Caption } from "@/components/ui/typography"
+import { Label, Heading9, BodySmall, Caption } from "@/components/ui/typography"
 import { sendInquiry } from "@/features/inquiries/actions"
 import { createClient } from "@/lib/supabase/client"
 import type { Tables } from "@/types"
@@ -113,12 +113,12 @@ function ClinicPreviewModal({
           <>
             <div className="mb-4 flex items-start justify-between">
               <div>
-                <BodySmall className="font-bold text-primary">{clinic.name}</BodySmall>
+                <Heading9 className="text-primary">{clinic.name}</Heading9>
                 <Caption className="text-secondary">
                   {clinic.city}, {clinic.country}
                 </Caption>
               </div>
-              <button onClick={onClose} className="text-secondary hover:text-primary text-title">
+              <button onClick={onClose} className="heading-6 text-secondary hover:text-primary">
                 &times;
               </button>
             </div>
@@ -230,13 +230,13 @@ export default function MatchResultCard({
       )}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand/10 text-body-small font-bold text-brand">
+          <div className="body-small flex h-8 w-8 items-center justify-center rounded-full bg-brand/10 text-brand">
             {rank}
           </div>
           <div>
             <button
               onClick={() => setShowPreview(true)}
-              className="font-semibold text-left hover:underline"
+              className="heading-9 text-left hover:underline"
             >
               {clinicName}
             </button>
@@ -244,7 +244,7 @@ export default function MatchResultCard({
           </div>
         </div>
         <div className="text-right">
-          <span className="text-headline font-bold text-primary">{matchResult.overall_score}</span>
+          <span className="heading-5 text-primary">{matchResult.overall_score}</span>
           <Caption className="text-secondary">/ 100</Caption>
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function MatchResultCard({
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <Caption className="w-10 text-right font-medium">
+              <Caption className="w-10 text-right">
                 {score}/{dim.max}
               </Caption>
             </div>

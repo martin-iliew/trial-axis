@@ -1,7 +1,13 @@
 import { getClinics } from "@/features/clinics/queries"
 import Navbar from "@/components/layout/Navbar"
 import { Badge } from "@/components/ui/badge"
-import { Heading5, Body, BodySmall, Caption } from "@/components/ui/typography"
+import {
+  Heading5,
+  Heading9,
+  Body,
+  BodySmall,
+  Caption,
+} from "@/components/ui/typography"
 import { MapPin } from "lucide-react"
 
 export const metadata = {
@@ -38,7 +44,7 @@ export default async function ClinicsPage() {
                 className="rounded-2xl border border-primary bg-surface-level-1 p-5 transition-colors"
               >
                 <div className="mb-3">
-                  <BodySmall className="font-semibold text-primary">{clinic.name}</BodySmall>
+                  <Heading9 className="text-primary">{clinic.name}</Heading9>
                   <div className="mt-1 flex items-center gap-1">
                     <MapPin className="size-3.5 text-icon-secondary" />
                     <Caption className="text-secondary">
