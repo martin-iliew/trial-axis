@@ -47,19 +47,6 @@ export default function RegisterPage() {
       return
     }
 
-    if (data.user) {
-      const { error: profileError } = await supabase.from("profiles").insert({
-        id: data.user.id,
-        role: values.role,
-        first_name: values.firstName,
-        last_name: values.lastName,
-      })
-      if (profileError) {
-        toast.error("Account created but profile setup failed. Please contact support.")
-        return
-      }
-    }
-
     toast.success("Account created! Signing you in…")
     router.push(values.role === "sponsor" ? "/sponsor/projects" : "/clinic/profile")
     router.refresh()
