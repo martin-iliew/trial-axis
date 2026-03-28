@@ -11,6 +11,7 @@ import {
   Caption,
 } from "@/components/ui/typography"
 import { ClipboardList, Cpu, Handshake } from "lucide-react"
+import { createServerClient } from "@/lib/supabase/server"
 
 function StatCard({
   value,
@@ -51,6 +52,11 @@ function StepCard({
 }
 
 export default async function Home() {
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const role = user?.user_metadata?.role as string | undefined
+  const homeHref = role === "sponsor" ? "/sponsor/projects" : role === "clinic_admin" ? "/clinic/profile" : null
+
   return (
     <>
       <Navbar />
@@ -70,14 +76,22 @@ export default async function Home() {
 
           {/* Dual CTA */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/register?role=sponsor">
-              <Button size="lg">Join as Sponsor</Button>
-            </Link>
-            <Link href="/register?role=clinic_admin">
-              <Button variant="outline" size="lg">
-                Register Your Clinic
-              </Button>
-            </Link>
+            {homeHref ? (
+              <Link href={homeHref}>
+                <Button size="lg">Go to Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/register?role=sponsor">
+                  <Button size="lg">Join as Sponsor</Button>
+                </Link>
+                <Link href="/register?role=clinic_admin">
+                  <Button variant="outline" size="lg">
+                    Register Your Clinic
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -135,11 +149,20 @@ export default async function Home() {
             Register your site, showcase your capabilities, and get matched with
             relevant trials automatically. No cold outreach — sponsors come to you.
           </Body>
-          <Link href="/register?role=clinic_admin">
-            <Button variant="outline" size="lg">
-              Register Your Clinic
-            </Button>
-          </Link>
+          {!user && (
+            <Link href="/register?role=clinic_admin">
+              <Button variant="outline" size="lg">
+                Register Your Clinic
+              </Button>
+            </Link>
+          )}
+          {role === "clinic_admin" && (
+            <Link href="/clinic/profile">
+              <Button variant="outline" size="lg">
+                Manage Your Clinic
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
 
