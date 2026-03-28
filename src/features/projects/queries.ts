@@ -113,6 +113,46 @@ export async function getMatchResultInquiries(matchResultIds: string[]) {
   return { data: data ?? [], error: null }
 }
 
+export async function getProjectInquiries(projectId: string) {
+  const supabase = await createServerClient()
+
+  const { data: matchResults } = await supabase
+    .from("match_results")
+    .select("id, clinic_id")
+    .eq("trial_project_id", projectId)
+
+  if (!matchResults || matchResults.length === 0) return { data: [], error: null }
+
+  const matchIds = matchResults.map((r) => r.id)
+  const clinicIds = [...new Set(matchResults.map((r) => r.clinic_id))]
+
+  const [inquiriesRes, clinicsRes] = await Promise.all([
+    supabase
+      .from("partnership_inquiries")
+      .select("*")
+      .in("match_result_id", matchIds)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("clinics")
+      .select("id, name, city")
+      .in("id", clinicIds),
+  ])
+
+  const clinicMap = new Map(
+    (clinicsRes.data ?? []).map((c) => [c.id, { name: c.name, city: c.city }])
+  )
+  const matchClinicMap = new Map(
+    matchResults.map((r) => [r.id, r.clinic_id])
+  )
+
+  const enriched = (inquiriesRes.data ?? []).map((inq) => ({
+    ...inq,
+    clinic: clinicMap.get(matchClinicMap.get(inq.match_result_id) ?? "") ?? null,
+  }))
+
+  return { data: enriched, error: null }
+}
+
 export async function getTherapeuticAreas() {
   const supabase = await createServerClient()
   const { data, error } = await supabase

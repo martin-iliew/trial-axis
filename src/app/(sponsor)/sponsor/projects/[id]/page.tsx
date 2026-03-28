@@ -1,9 +1,13 @@
 import { createServerClient } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
-import { getProjectDetail, getProjectRequirements } from "@/features/projects/queries"
+import {
+  getProjectDetail,
+  getProjectRequirements,
+  getProjectInquiries,
+} from "@/features/projects/queries"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Heading5, BodySmall, Caption } from "@/components/ui/typography"
+import { Heading5, Heading6, Body, BodySmall, Caption } from "@/components/ui/typography"
 import Link from "next/link"
 import RequirementsSection from "./components/RequirementsSection"
 import RunMatchButton from "./components/RunMatchButton"
@@ -31,7 +35,14 @@ export default async function ProjectDetailPage({
   if (!project) notFound()
 
   const { data: requirements } = await getProjectRequirements(id)
+  const { data: inquiries } = await getProjectInquiries(id)
   const area = project.therapeutic_areas as { name: string } | null
+
+  const inquiryStatusColors: Record<string, string> = {
+    pending: "bg-surface-status-warning text-icon-status-warning",
+    accepted: "bg-surface-status-success text-icon-status-success",
+    declined: "bg-surface-status-danger text-icon-status-danger",
+  }
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
@@ -80,9 +91,49 @@ export default async function ProjectDetailPage({
 
       <RequirementsSection projectId={id} requirements={requirements} />
 
+      {/* Inquiry Status Section */}
+      {inquiries.length > 0 && (
+        <div className="mt-8">
+          <Heading6 className="mb-3">Inquiry Status</Heading6>
+          <div className="space-y-3">
+            {inquiries.map((inq) => {
+              const clinic = inq.clinic as { name: string; city: string } | null
+              return (
+                <div
+                  key={inq.id}
+                  className="flex items-start justify-between rounded-xl border border-primary p-3"
+                >
+                  <div>
+                    <BodySmall className="font-medium">
+                      {clinic?.name ?? "Unknown Clinic"}
+                    </BodySmall>
+                    <Caption className="text-secondary">
+                      Sent {new Date(inq.created_at).toLocaleDateString()}
+                    </Caption>
+                    {inq.response_message && (
+                      <Caption className="mt-1 text-secondary">
+                        &ldquo;{inq.response_message}&rdquo;
+                      </Caption>
+                    )}
+                    {inq.decline_reason && (
+                      <Caption className="mt-1 text-icon-status-danger">
+                        Reason: {inq.decline_reason}
+                      </Caption>
+                    )}
+                  </div>
+                  <Badge className={inquiryStatusColors[inq.status] ?? ""}>
+                    {inq.status}
+                  </Badge>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="mt-8 flex gap-3">
         <RunMatchButton projectId={id} />
-        {project.status === "matched" && (
+        {(project.status === "searching" || project.status === "matched") && (
           <Link href={`/sponsor/projects/${id}/matches`}>
             <Button variant="outline">View Match Results</Button>
           </Link>

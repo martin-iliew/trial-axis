@@ -23,6 +23,9 @@ export default async function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4">
+          <Link href="/clinics" className="text-body-small text-secondary hover:text-primary">
+            Clinics
+          </Link>
           {role === "sponsor" && (
             <Link href="/sponsor/projects" className="text-body-small text-secondary hover:text-primary">
               My Projects
