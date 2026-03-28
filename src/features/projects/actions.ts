@@ -3,44 +3,33 @@
 import { z } from "zod"
 import { createServerClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import type { Enums } from "@/types"
 
 const createTrialProjectSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  therapeutic_area_id: z.string().uuid("Invalid therapeutic area ID").optional(),
-  phase: z.enum(["I", "Ia", "Ib", "II", "IIa", "IIb", "III", "IV"]).optional(),
-  required_patient_count: z.number().positive("Patient count must be positive").optional(),
+  therapeutic_area_id: z.string().uuid().optional(),
+  phase: z.string().optional(),
+  target_enrollment: z.number().positive().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   geographic_preference: z.string().optional(),
 })
 
 const addRequirementSchema = z.object({
-  trial_project_id: z.string().uuid("Invalid project ID"),
-  requirement_type: z.enum([
-    "equipment",
-    "certification",
-    "specialization",
-    "capacity",
-    "phase_experience",
-    "molecule_experience",
-  ]),
-  value: z.string().min(1, "Value is required"),
-  priority: z.enum(["required", "preferred", "nice_to_have"]),
-})
-
-const deleteRequirementSchema = z.object({
-  id: z.string().min(1, "Requirement ID is required"),
-  trialProjectId: z.string().min(1, "Project ID is required"),
+  project_id: z.string().uuid("Invalid project ID"),
+  type: z.enum(["therapeutic_area", "equipment", "patient_volume", "certification", "geography", "other"]),
+  label: z.string().min(1, "Label is required"),
+  value: z.record(z.unknown()),
+  is_hard_filter: z.boolean().default(false),
+  weight: z.number().min(0).max(1).default(1.0),
 })
 
 export async function createTrialProject(data: {
   title: string
   description?: string
   therapeutic_area_id?: string
-  phase?: Enums<"trial_phase">
-  required_patient_count?: number
+  phase?: string
+  target_enrollment?: number
   start_date?: string
   end_date?: string
   geographic_preference?: string
@@ -52,9 +41,17 @@ export async function createTrialProject(data: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("organization_id")
+    .eq("id", user.id)
+    .single()
+
+  if (!profile?.organization_id) return { error: "No organization found. Please complete your profile first." }
+
   const { data: project, error } = await supabase
     .from("trial_projects")
-    .insert({ ...result.data, sponsor_user_id: user.id, status: "draft" as const })
+    .insert({ ...result.data, organization_id: profile.organization_id, status: "draft" })
     .select()
     .single()
 
@@ -64,10 +61,12 @@ export async function createTrialProject(data: {
 }
 
 export async function addRequirement(data: {
-  trial_project_id: string
-  requirement_type: Enums<"requirement_type">
-  value: string
-  priority: "required" | "preferred" | "nice_to_have"
+  project_id: string
+  type: "therapeutic_area" | "equipment" | "patient_volume" | "certification" | "geography" | "other"
+  label: string
+  value: Record<string, unknown>
+  is_hard_filter?: boolean
+  weight?: number
 }) {
   const result = addRequirementSchema.safeParse(data)
   if (!result.success) return { error: result.error.issues[0].message }
@@ -76,37 +75,48 @@ export async function addRequirement(data: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("organization_id")
+    .eq("id", user.id)
+    .single()
+
   const { data: project } = await supabase
     .from("trial_projects")
     .select("id")
-    .eq("id", result.data.trial_project_id)
-    .eq("sponsor_user_id", user.id)
+    .eq("id", result.data.project_id)
+    .eq("organization_id", profile?.organization_id ?? "")
     .single()
 
   if (!project) return { error: "Project not found or not authorized" }
 
   const { data: requirement, error } = await supabase
-    .from("trial_requirements")
-    .insert({ ...result.data, description: result.data.value })
+    .from("project_requirements")
+    .insert(result.data)
     .select()
     .single()
 
   if (error) return { error: error.message }
-  revalidatePath(`/sponsor/projects/${result.data.trial_project_id}`)
+  revalidatePath(`/sponsor/projects/${result.data.project_id}`)
   return { data: requirement }
 }
 
-export async function deleteRequirement(id: string, trialProjectId: string) {
-  const result = deleteRequirementSchema.safeParse({ id, trialProjectId })
-  if (!result.success) return { error: result.error.issues[0].message }
+export async function deleteRequirement(id: string, projectId: string) {
+  if (!id || !projectId) return { error: "Invalid parameters" }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("organization_id")
+    .eq("id", user.id)
+    .single()
+
   const { data: requirement } = await supabase
-    .from("trial_requirements")
-    .select("id, trial_project_id")
+    .from("project_requirements")
+    .select("id, project_id")
     .eq("id", id)
     .single()
 
@@ -115,18 +125,18 @@ export async function deleteRequirement(id: string, trialProjectId: string) {
   const { data: project } = await supabase
     .from("trial_projects")
     .select("id")
-    .eq("id", requirement.trial_project_id)
-    .eq("sponsor_user_id", user.id)
+    .eq("id", requirement.project_id)
+    .eq("organization_id", profile?.organization_id ?? "")
     .single()
 
   if (!project) return { error: "Not authorized" }
 
   const { error } = await supabase
-    .from("trial_requirements")
+    .from("project_requirements")
     .delete()
     .eq("id", id)
 
   if (error) return { error: error.message }
-  revalidatePath(`/sponsor/projects/${trialProjectId}`)
+  revalidatePath(`/sponsor/projects/${projectId}`)
   return { error: null }
 }

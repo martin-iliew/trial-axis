@@ -17,7 +17,7 @@ const schema = z.object({
   description: z.string().optional(),
   therapeutic_area_id: z.string().optional(),
   phase: z.string().optional(),
-  required_patient_count: z.number().positive().optional(),
+  target_enrollment: z.number().positive().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   geographic_preference: z.string().optional(),
@@ -40,8 +40,8 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
       title: values.title,
       description: values.description || undefined,
       therapeutic_area_id: values.therapeutic_area_id || undefined,
-      phase: (values.phase as Parameters<typeof createTrialProject>[0]["phase"]) || undefined,
-      required_patient_count: values.required_patient_count || undefined,
+      phase: values.phase || undefined,
+      target_enrollment: values.target_enrollment || undefined,
       start_date: values.start_date || undefined,
       end_date: values.end_date || undefined,
       geographic_preference: values.geographic_preference || undefined,
@@ -115,13 +115,13 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="required_patient_count">Patient Count</Label>
+          <Label htmlFor="target_enrollment">Target Enrollment</Label>
           <Input
-            id="required_patient_count"
+            id="target_enrollment"
             type="number"
             min={1}
             placeholder="e.g. 50"
-            {...register("required_patient_count", { valueAsNumber: true })}
+            {...register("target_enrollment", { valueAsNumber: true })}
           />
         </div>
 

@@ -2,10 +2,19 @@ import { createServerClient } from "@/lib/supabase/server"
 
 export async function getProjectsForSponsor(userId: string) {
   const supabase = await createServerClient()
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("organization_id")
+    .eq("id", userId)
+    .single()
+
+  if (!profile?.organization_id) return { data: [], error: null }
+
   const { data: projects, error } = await supabase
     .from("trial_projects")
     .select("*")
-    .eq("sponsor_user_id", userId)
+    .eq("organization_id", profile.organization_id)
     .order("created_at", { ascending: false })
 
   if (error) return { data: [], error: error.message }
@@ -38,11 +47,20 @@ export async function getProjectsForSponsor(userId: string) {
 
 export async function getProjectDetail(projectId: string, userId: string) {
   const supabase = await createServerClient()
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("organization_id")
+    .eq("id", userId)
+    .single()
+
+  if (!profile?.organization_id) return { data: null, error: "No organization found" }
+
   const { data: project, error } = await supabase
     .from("trial_projects")
     .select("*")
     .eq("id", projectId)
-    .eq("sponsor_user_id", userId)
+    .eq("organization_id", profile.organization_id)
     .single()
 
   if (error || !project) return { data: null, error: error?.message ?? "Not found" }
@@ -63,9 +81,9 @@ export async function getProjectDetail(projectId: string, userId: string) {
 export async function getProjectRequirements(projectId: string) {
   const supabase = await createServerClient()
   const { data, error } = await supabase
-    .from("trial_requirements")
+    .from("project_requirements")
     .select("*")
-    .eq("trial_project_id", projectId)
+    .eq("project_id", projectId)
     .order("created_at")
 
   if (error) return { data: [], error: error.message }
@@ -77,7 +95,7 @@ export async function getMatchResults(projectId: string) {
   const { data: results, error } = await supabase
     .from("match_results")
     .select("*")
-    .eq("trial_project_id", projectId)
+    .eq("project_id", projectId)
     .order("overall_score", { ascending: false })
 
   if (error) return { data: [], error: error.message }
@@ -105,7 +123,7 @@ export async function getMatchResultInquiries(matchResultIds: string[]) {
   if (matchResultIds.length === 0) return { data: [], error: null }
   const supabase = await createServerClient()
   const { data, error } = await supabase
-    .from("partnership_inquiries")
+    .from("inquiries")
     .select("*")
     .in("match_result_id", matchResultIds)
 
@@ -119,7 +137,7 @@ export async function getProjectInquiries(projectId: string) {
   const { data: matchResults } = await supabase
     .from("match_results")
     .select("id, clinic_id")
-    .eq("trial_project_id", projectId)
+    .eq("project_id", projectId)
 
   if (!matchResults || matchResults.length === 0) return { data: [], error: null }
 
@@ -128,7 +146,7 @@ export async function getProjectInquiries(projectId: string) {
 
   const [inquiriesRes, clinicsRes] = await Promise.all([
     supabase
-      .from("partnership_inquiries")
+      .from("inquiries")
       .select("*")
       .in("match_result_id", matchIds)
       .order("created_at", { ascending: false }),

@@ -12,12 +12,12 @@ import type { Tables, Enums } from "@/types"
 type RequirementType = Enums<"requirement_type">
 
 const requirementTypes: { value: RequirementType; label: string }[] = [
-  { value: "specialization", label: "Specialization" },
+  { value: "therapeutic_area", label: "Therapeutic Area" },
   { value: "equipment", label: "Equipment" },
   { value: "certification", label: "Certification" },
-  { value: "capacity", label: "Capacity" },
-  { value: "phase_experience", label: "Phase Experience" },
-  { value: "molecule_experience", label: "Molecule Experience" },
+  { value: "patient_volume", label: "Patient Volume" },
+  { value: "geography", label: "Geography" },
+  { value: "other", label: "Other" },
 ]
 
 const priorityColors: Record<string, string> = {
@@ -26,12 +26,24 @@ const priorityColors: Record<string, string> = {
   nice_to_have: "bg-surface-status-info text-icon-status-info",
 }
 
+function getPriorityLabel(req: Tables<"project_requirements">): string {
+  if (req.is_hard_filter) return "Required"
+  if ((req.weight ?? 1) >= 0.7) return "Preferred"
+  return "Nice to Have"
+}
+
+function getPriorityKey(req: Tables<"project_requirements">): string {
+  if (req.is_hard_filter) return "required"
+  if ((req.weight ?? 1) >= 0.7) return "preferred"
+  return "nice_to_have"
+}
+
 export default function RequirementsSection({
   projectId,
   requirements: initialReqs,
 }: {
   projectId: string
-  requirements: Tables<"trial_requirements">[]
+  requirements: Tables<"project_requirements">[]
 }) {
   const [requirements, setRequirements] = useState(initialReqs)
   const [showForm, setShowForm] = useState(false)
@@ -45,10 +57,12 @@ export default function RequirementsSection({
     setLoading(true)
 
     const result = await addRequirement({
-      trial_project_id: projectId,
-      requirement_type: type,
-      value,
-      priority,
+      project_id: projectId,
+      type,
+      label: value,
+      value: { text: value },
+      is_hard_filter: priority === "required",
+      weight: priority === "required" ? 1.0 : priority === "preferred" ? 0.7 : 0.3,
     })
 
     if (result.error) {
@@ -140,9 +154,9 @@ export default function RequirementsSection({
               className="flex items-center justify-between rounded-xl border border-primary px-3 py-2"
             >
               <div className="flex items-center gap-2">
-                <Badge>{req.requirement_type}</Badge>
-                <BodySmall>{req.value}</BodySmall>
-                <Badge className={priorityColors[req.priority ?? ""] ?? ""}>{req.priority}</Badge>
+                <Badge>{req.type}</Badge>
+                <BodySmall>{req.label}</BodySmall>
+                <Badge className={priorityColors[getPriorityKey(req)] ?? ""}>{getPriorityLabel(req)}</Badge>
               </div>
               <button
                 onClick={() => handleDelete(req.id)}
