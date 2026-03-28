@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 import type { Tables } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label, Heading5, BodySmall, Caption } from "@/components/ui/typography"
+import { Label, Heading5, Heading9, BodySmall, Caption } from "@/components/ui/typography"
 import {
   upsertClinic,
   upsertSpecializations,
@@ -107,7 +107,7 @@ function ProfileTab({
         <Input id="name" placeholder="City Oncology Center" {...register("name")} />
         {errors.name && <Caption className="text-icon-status-danger">{errors.name.message}</Caption>}
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="city">City</Label>
           <Input id="city" placeholder="Sofia" {...register("city")} />
@@ -123,12 +123,12 @@ function ProfileTab({
         <Label htmlFor="description">Description</Label>
         <textarea
           id="description"
-          className="h-24 w-full resize-none rounded-xl border border-primary bg-surface-level-0 px-3 py-2 text-body-small text-primary placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
+          className="body-small h-24 w-full resize-none rounded-xl border border-primary bg-surface-level-0 px-3 py-2 text-primary placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
           placeholder="Brief overview of your clinic…"
           {...register("description")}
         />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="contact_email">Contact email</Label>
           <Input id="contact_email" type="email" placeholder="contact@clinic.com" {...register("contact_email")} />
@@ -161,9 +161,9 @@ function ProfileTab({
       {therapeuticAreas.length > 0 && (
         <div className="space-y-2">
           <Label>Specializations</Label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {therapeuticAreas.map((area) => (
-              <Label key={area.id} className="flex cursor-pointer items-center gap-2 text-body-small">
+              <Label key={area.id} className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={checkedAreas.has(area.id)}
@@ -269,12 +269,12 @@ function EquipmentTab({
           {equipment.map((eq) => (
             <li key={eq.id} className="flex items-center justify-between rounded-xl border border-primary px-4 py-3">
               <div>
-                <BodySmall className="font-medium text-primary">{eq.name}</BodySmall>
+                <BodySmall className="text-primary">{eq.name}</BodySmall>
                 <Caption className="text-secondary">{eq.category} · qty {eq.quantity}</Caption>
               </div>
               <button
                 onClick={() => handleDelete(eq.id)}
-                className="text-caption text-icon-status-danger hover:underline"
+                className="caption text-icon-status-danger hover:underline"
               >
                 Remove
               </button>
@@ -284,8 +284,8 @@ function EquipmentTab({
       )}
 
       <form onSubmit={handleSubmit(onAdd)} className="space-y-3 rounded-2xl border border-primary p-4">
-        <BodySmall className="font-medium text-primary">Add equipment</BodySmall>
-        <div className="grid grid-cols-2 gap-3">
+        <Heading9 className="text-primary">Add equipment</Heading9>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="eq_name">Name</Label>
             <Input id="eq_name" placeholder="MRI Scanner" {...register("name")} />
@@ -295,7 +295,7 @@ function EquipmentTab({
             <Label htmlFor="category">Category</Label>
             <select
               id="category"
-              className="h-10 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-body-small text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
+              className="body-small h-10 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
               {...register("category")}
             >
               {["imaging","laboratory","monitoring","surgical","rehabilitation","diagnostic","other"].map((c) => (
@@ -304,7 +304,7 @@ function EquipmentTab({
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="model">Type</Label>
             <Input id="model" placeholder="e.g. MRI" {...register("model")} />
@@ -413,7 +413,7 @@ function CertsAvailabilityTab({
   return (
     <div className="max-w-xl space-y-8">
       <div className="space-y-4">
-        <BodySmall className="font-semibold text-primary">Certifications</BodySmall>
+        <Heading9 className="text-primary">Certifications</Heading9>
         {certifications.length === 0 ? (
           <Caption className="text-secondary">No certifications added yet.</Caption>
         ) : (
@@ -421,12 +421,12 @@ function CertsAvailabilityTab({
             {certifications.map((cert) => (
               <li key={cert.id} className="flex items-center justify-between rounded-xl border border-primary px-4 py-3">
                 <div>
-                  <BodySmall className="font-medium text-primary">{cert.certification_name}</BodySmall>
+                  <BodySmall className="text-primary">{cert.certification_name}</BodySmall>
                   {cert.issued_by && <Caption className="text-secondary">Issued by {cert.issued_by}</Caption>}
                 </div>
                 <button
                   onClick={() => handleDeleteCert(cert.id)}
-                  className="text-caption text-icon-status-danger hover:underline"
+                  className="caption text-icon-status-danger hover:underline"
                 >
                   Remove
                 </button>
@@ -436,7 +436,7 @@ function CertsAvailabilityTab({
         )}
 
         <form onSubmit={certForm.handleSubmit(onAddCert)} className="space-y-3 rounded-2xl border border-primary p-4">
-          <BodySmall className="font-medium text-primary">Add certification</BodySmall>
+          <Heading9 className="text-primary">Add certification</Heading9>
           <div className="space-y-1.5">
             <Label htmlFor="certification_name">Name</Label>
             <Input id="certification_name" placeholder="GCP Certificate" {...certForm.register("certification_name")} />
@@ -444,7 +444,7 @@ function CertsAvailabilityTab({
               <Caption className="text-icon-status-danger">{certForm.formState.errors.certification_name.message}</Caption>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="issued_by">Issued by</Label>
               <Input id="issued_by" placeholder="ICH" {...certForm.register("issued_by")} />
@@ -461,7 +461,7 @@ function CertsAvailabilityTab({
       </div>
 
       <div className="space-y-4">
-        <BodySmall className="font-semibold text-primary">Availability windows</BodySmall>
+        <Heading9 className="text-primary">Availability windows</Heading9>
         {availability.length === 0 ? (
           <Caption className="text-secondary">No availability windows added yet.</Caption>
         ) : (
@@ -480,7 +480,7 @@ function CertsAvailabilityTab({
                 </div>
                 <button
                   onClick={() => handleDeleteAvailability(a.id)}
-                  className="text-caption text-icon-status-danger hover:underline"
+                  className="caption text-icon-status-danger hover:underline"
                 >
                   Remove
                 </button>
@@ -490,8 +490,8 @@ function CertsAvailabilityTab({
         )}
 
         <form onSubmit={availForm.handleSubmit(onAddAvailability)} className="space-y-3 rounded-2xl border border-primary p-4">
-          <BodySmall className="font-medium text-primary">Add availability window</BodySmall>
-          <div className="grid grid-cols-2 gap-3">
+          <Heading9 className="text-primary">Add availability window</Heading9>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="start_date">From</Label>
               <Input id="start_date" type="date" {...availForm.register("start_date")} />
@@ -511,7 +511,7 @@ function CertsAvailabilityTab({
             <Label htmlFor="avail_type">Status</Label>
             <select
               id="avail_type"
-              className="h-10 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-body-small text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
+              className="body-small h-10 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
               {...availForm.register("type")}
             >
               <option value="available">Available</option>
@@ -560,7 +560,7 @@ function ProfileCompletion({
   return (
     <div className="mb-6 rounded-2xl border border-primary p-4">
       <div className="mb-2 flex items-center justify-between">
-        <BodySmall className="font-medium">Profile completion</BodySmall>
+        <BodySmall>Profile completion</BodySmall>
         <Caption className="text-secondary">{completed}/{steps.length} steps</Caption>
       </div>
       <div className="mb-3 h-2 rounded-full bg-surface-level-3">
@@ -568,7 +568,7 @@ function ProfileCompletion({
       </div>
       <div className="flex flex-wrap gap-2">
         {steps.filter((s) => !s.done).map((s) => (
-          <span key={s.label} className="rounded-full bg-surface-status-warning px-2.5 py-0.5 text-caption text-icon-status-warning">
+          <span key={s.label} className="caption rounded-full bg-surface-status-warning px-2.5 py-0.5 text-icon-status-warning">
             {s.label}
           </span>
         ))}
@@ -589,7 +589,7 @@ export default function ClinicProfileTabs({
         clinic={clinic} equipment={equipment} certifications={certifications}
         availability={availability} selectedSpecializations={selectedSpecializations}
       />
-      <div className="mb-8 flex gap-1 border-b border-primary">
+      <div className="mb-8 flex gap-1 overflow-x-auto border-b border-primary">
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -597,7 +597,7 @@ export default function ClinicProfileTabs({
             aria-selected={activeTab === tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "-mb-px border-b-2 px-4 py-2.5 text-body-small font-medium transition-colors",
+              "body-small -mb-px shrink-0 border-b-2 px-4 py-2.5 transition-colors",
               activeTab === tab
                 ? "border-primary text-primary"
                 : "border-transparent text-secondary hover:text-primary"

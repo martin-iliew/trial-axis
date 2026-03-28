@@ -71,7 +71,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => setValue("role", r)}
                 className={cn(
-                  "rounded-xl border px-4 py-2.5 text-body-small font-medium transition-colors",
+                  "body-small rounded-xl border px-4 py-2.5 transition-colors",
                   selectedRole === r
                     ? "border-primary bg-surface-level-2 text-primary"
                     : "border-primary/30 text-secondary hover:border-primary"

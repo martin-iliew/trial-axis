@@ -83,12 +83,12 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="therapeutic_area_id">Therapeutic Area</Label>
             <select
               id="therapeutic_area_id"
-              className="h-11 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-body-small text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
+              className="body-small h-11 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
               {...register("therapeutic_area_id")}
             >
               <option value="">Select area...</option>
@@ -104,7 +104,7 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
             <Label htmlFor="phase">Phase</Label>
             <select
               id="phase"
-              className="h-11 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-body-small text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
+              className="body-small h-11 w-full rounded-xl border border-primary bg-surface-level-0 px-3 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-level-5"
               {...register("phase")}
             >
               <option value="">Select phase...</option>
@@ -128,7 +128,7 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="start_date">Start Date</Label>
             <Input id="start_date" type="date" {...register("start_date")} />

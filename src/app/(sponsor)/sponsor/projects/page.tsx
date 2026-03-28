@@ -4,7 +4,7 @@ import { getProjectsForSponsor } from "@/features/projects/queries"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Heading5, Body, BodySmall } from "@/components/ui/typography"
+import { Heading5, Heading9, Body, BodySmall } from "@/components/ui/typography"
 import { cn } from "@/lib/utils"
 
 const statusColors: Record<string, string> = {
@@ -46,7 +46,7 @@ export default async function ProjectsPage({
             key={t}
             href={t === "active" ? "/sponsor/projects" : "/sponsor/projects?tab=archived"}
             className={cn(
-              "-mb-px border-b-2 px-4 py-2.5 text-body-small font-medium capitalize transition-colors",
+              "body-small -mb-px border-b-2 px-4 py-2.5 font-medium capitalize transition-colors",
               tab === t
                 ? "border-primary text-primary"
                 : "border-transparent text-secondary hover:text-primary"
@@ -80,7 +80,7 @@ export default async function ProjectsPage({
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <Body className="font-semibold">{project.title}</Body>
+                    <Heading9>{project.title}</Heading9>
                     <div className="mt-1 flex items-center gap-2">
                       {area && (
                         <BodySmall className="text-secondary">{area.name}</BodySmall>

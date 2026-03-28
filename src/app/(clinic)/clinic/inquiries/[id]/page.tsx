@@ -3,7 +3,7 @@ import { redirect, notFound } from "next/navigation"
 import { getClinicForUser, getInquiryDetail } from "@/features/inquiries/queries"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
-import { Heading5, BodySmall, Caption } from "@/components/ui/typography"
+import { Heading5, Heading9, BodySmall, Caption } from "@/components/ui/typography"
 import InquiryResponseForm from "./components/InquiryResponseForm"
 
 const statusColors: Record<string, string> = {
@@ -46,7 +46,7 @@ export default async function InquiryDetailPage({
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6">
-        <Link href="/clinic/inquiries" className="text-body-small text-secondary hover:underline">← Back to inquiries</Link>
+        <Link href="/clinic/inquiries" className="body-small text-secondary hover:underline">← Back to inquiries</Link>
       </div>
       <div className="mb-6 flex items-start justify-between">
         <div>
@@ -61,18 +61,18 @@ export default async function InquiryDetailPage({
 
       {trial && (
         <div className="mb-6 rounded-2xl border border-primary p-4">
-          <Caption className="mb-3 font-semibold uppercase text-secondary">Trial Details</Caption>
-          <div className="grid grid-cols-2 gap-3">
+          <Heading9 className="mb-3 uppercase text-secondary">Trial Details</Heading9>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {trial.therapeutic_areas && (
               <div>
                 <Caption className="text-secondary">Therapeutic Area</Caption>
-                <BodySmall className="font-medium">{trial.therapeutic_areas.name}</BodySmall>
+                <BodySmall>{trial.therapeutic_areas.name}</BodySmall>
               </div>
             )}
             {trial.phase && (
               <div>
                 <Caption className="text-secondary">Phase</Caption>
-                <BodySmall className="font-medium">Phase {trial.phase}</BodySmall>
+                <BodySmall>Phase {trial.phase}</BodySmall>
               </div>
             )}
             {trial.target_enrollment && (
@@ -84,19 +84,19 @@ export default async function InquiryDetailPage({
             {trial.geographic_preference && (
               <div>
                 <Caption className="text-secondary">Geographic Preference</Caption>
-                <BodySmall className="font-medium">{trial.geographic_preference}</BodySmall>
+                <BodySmall>{trial.geographic_preference}</BodySmall>
               </div>
             )}
             {trial.start_date && (
               <div>
                 <Caption className="text-secondary">Timeline</Caption>
-                <BodySmall className="font-medium">{trial.start_date} — {trial.end_date ?? "TBD"}</BodySmall>
+                <BodySmall>{trial.start_date} — {trial.end_date ?? "TBD"}</BodySmall>
               </div>
             )}
             {matchScore !== undefined && (
               <div>
                 <Caption className="text-secondary">Match Score</Caption>
-                <BodySmall className="font-medium">{matchScore}/100</BodySmall>
+                <BodySmall>{matchScore}/100</BodySmall>
               </div>
             )}
           </div>
@@ -113,7 +113,7 @@ export default async function InquiryDetailPage({
         <InquiryResponseForm inquiryId={inquiry.id} />
       ) : (
         <div className="rounded-2xl border border-primary p-4">
-          <Caption className="mb-2 font-semibold uppercase text-secondary">Your Response</Caption>
+          <Heading9 className="mb-2 uppercase text-secondary">Your Response</Heading9>
           <Badge className={statusColors[inquiry.status] ?? ""}>{inquiry.status}</Badge>
           {inquiry.messages
             .filter((m) => m.sender_id !== inquiry.created_by)

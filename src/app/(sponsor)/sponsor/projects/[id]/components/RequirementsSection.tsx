@@ -6,7 +6,7 @@ import { addRequirement, deleteRequirement } from "@/features/projects/actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label, BodySmall, Caption } from "@/components/ui/typography"
+import { Label, Heading9, BodySmall, Caption } from "@/components/ui/typography"
 import type { Tables, Enums } from "@/types"
 
 type RequirementType = Enums<"requirement_type">
@@ -92,10 +92,10 @@ export default function RequirementsSection({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <BodySmall className="font-semibold text-primary">Requirements</BodySmall>
+        <Heading9 className="text-primary">Requirements</Heading9>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="text-body-small text-brand hover:underline"
+          className="body-small text-brand hover:underline"
         >
           {showForm ? "Cancel" : "+ Add Requirement"}
         </button>
@@ -103,13 +103,13 @@ export default function RequirementsSection({
 
       {showForm && (
         <form onSubmit={handleAdd} className="mb-4 rounded-2xl border border-primary p-4">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="space-y-1">
               <Label>Type</Label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as RequirementType)}
-                className="h-9 w-full rounded-xl border border-primary bg-surface-level-0 px-2 text-body-small text-primary focus-visible:outline-none"
+                className="body-small h-9 w-full rounded-xl border border-primary bg-surface-level-0 px-2 text-primary focus-visible:outline-none"
               >
                 {requirementTypes.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -133,7 +133,7 @@ export default function RequirementsSection({
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as typeof priority)}
-                className="h-9 w-full rounded-xl border border-primary bg-surface-level-0 px-2 text-body-small text-primary focus-visible:outline-none"
+                className="body-small h-9 w-full rounded-xl border border-primary bg-surface-level-0 px-2 text-primary focus-visible:outline-none"
               >
                 <option value="required">Required</option>
                 <option value="preferred">Preferred</option>
@@ -165,7 +165,7 @@ export default function RequirementsSection({
               </div>
               <button
                 onClick={() => handleDelete(req.id)}
-                className="text-body-small text-secondary hover:text-icon-status-danger"
+                className="body-small text-secondary hover:text-icon-status-danger"
               >
                 Remove
               </button>

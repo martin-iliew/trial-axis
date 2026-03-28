@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { respondToInquiry } from "@/features/inquiries/actions"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Label, Caption } from "@/components/ui/typography"
+import { Label, Heading9, Caption } from "@/components/ui/typography"
 
 export default function InquiryResponseForm({ inquiryId }: { inquiryId: string }) {
   const router = useRouter()
@@ -37,7 +37,7 @@ export default function InquiryResponseForm({ inquiryId }: { inquiryId: string }
 
   return (
     <div className="rounded-2xl border border-primary p-4">
-      <Caption className="mb-3 font-semibold uppercase text-secondary">Respond to Inquiry</Caption>
+      <Heading9 className="mb-3 uppercase text-secondary">Respond to Inquiry</Heading9>
       {error && (
         <div className="mb-3 rounded-xl bg-surface-status-danger p-2">
           <Caption className="text-icon-status-danger">{error}</Caption>

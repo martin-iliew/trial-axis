@@ -50,7 +50,7 @@ export default async function ProjectDetailPage({
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6">
-        <Link href="/sponsor/projects" className="text-body-small text-secondary hover:underline">
+        <Link href="/sponsor/projects" className="body-small text-secondary hover:underline">
           ← Back to projects
         </Link>
       </div>
@@ -75,7 +75,7 @@ export default async function ProjectDetailPage({
         <BodySmall className="mb-6 text-secondary">{project.description}</BodySmall>
       )}
 
-      <div className="mb-6 grid grid-cols-3 gap-4 rounded-2xl border border-primary p-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 rounded-2xl border border-primary p-4 sm:grid-cols-3">
         <div>
           <Caption className="text-secondary">Patient Count</Caption>
           <BodySmall className="font-medium">
@@ -84,11 +84,11 @@ export default async function ProjectDetailPage({
         </div>
         <div>
           <Caption className="text-secondary">Start Date</Caption>
-          <BodySmall className="font-medium">{project.start_date ?? "Not set"}</BodySmall>
+          <BodySmall>{project.start_date ?? "Not set"}</BodySmall>
         </div>
         <div>
           <Caption className="text-secondary">End Date</Caption>
-          <BodySmall className="font-medium">{project.end_date ?? "Not set"}</BodySmall>
+          <BodySmall>{project.end_date ?? "Not set"}</BodySmall>
         </div>
       </div>
 
@@ -107,7 +107,7 @@ export default async function ProjectDetailPage({
                   className="flex items-start justify-between rounded-xl border border-primary p-3"
                 >
                   <div>
-                    <BodySmall className="font-medium">
+                    <BodySmall>
                       {clinic?.name ?? "Unknown Clinic"}
                     </BodySmall>
                     <Caption className="text-secondary">
@@ -124,7 +124,7 @@ export default async function ProjectDetailPage({
         </div>
       )}
 
-      <div className="mt-8 flex gap-3">
+      <div className="mt-8 flex flex-wrap gap-3">
         <RunMatchButton projectId={id} hasMatches={project.status === "active"} />
         {project.status === "active" && (
           <Link href={`/sponsor/projects/${id}/matches`}>
