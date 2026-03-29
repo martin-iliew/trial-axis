@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServerClient } from "@/lib/supabase/server";
@@ -22,8 +23,8 @@ export default async function Navbar() {
   return (
     <nav className="border-b border-primary bg-surface-level-1 px-3 py-4 sm:px-6">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
-        <Link href="/" className="heading-7 text-primary">
-          TrialAxis
+        <Link href="/" className="flex items-center">
+          <Image src="/logo.svg" alt="TrialAxis" width={120} height={39} priority />
         </Link>
 
         {/* Desktop nav — hidden on mobile */}
