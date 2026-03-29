@@ -32,11 +32,27 @@ function scoreBarColor(score: number, max: number): string {
   return "bg-icon-status-danger"
 }
 
-const statusColors: Record<string, string> = {
+// match_results.status — shown before any inquiry is sent
+const matchStatusColors: Record<string, string> = {
   pending: "bg-surface-status-warning text-icon-status-warning",
   reviewed: "bg-surface-status-info text-icon-status-info",
   accepted: "bg-surface-status-success text-icon-status-success",
   rejected: "bg-surface-status-danger text-icon-status-danger",
+}
+
+// inquiries.status — shown once an inquiry row exists
+const inquiryStatusColors: Record<string, string> = {
+  open: "bg-surface-status-info text-icon-status-info",
+  in_progress: "bg-surface-status-success text-icon-status-success",
+  closed: "bg-surface-level-2 text-tertiary",
+  withdrawn: "bg-surface-level-2 text-tertiary",
+}
+
+const inquiryStatusLabels: Record<string, string> = {
+  open: "Inquiry Sent",
+  in_progress: "Accepted",
+  closed: "Declined",
+  withdrawn: "Withdrawn",
 }
 
 function ClinicPreviewModal({
@@ -230,13 +246,15 @@ export default function MatchResultCard({
       <div className="mt-4 border-t border-primary pt-3">
         {sent || inquiry ? (
           <div className="flex items-center gap-2">
-            <Badge className={statusColors[inquiry ? (inquiry.status === "in_progress" ? "accepted" : inquiry.status === "closed" ? "rejected" : "reviewed") : matchResult.status] ?? ""}>
-              {inquiry?.status === "in_progress"
-                ? "Accepted"
-                : inquiry?.status === "closed"
-                  ? "Declined"
-                  : "Inquiry Sent"}
-            </Badge>
+            {inquiry ? (
+              <Badge className={inquiryStatusColors[inquiry.status] ?? ""}>
+                {inquiryStatusLabels[inquiry.status] ?? inquiry.status}
+              </Badge>
+            ) : (
+              <Badge className={matchStatusColors[matchResult.status] ?? ""}>
+                {matchResult.status}
+              </Badge>
+            )}
           </div>
         ) : showInquiryForm ? (
           <form onSubmit={handleSend} className="space-y-3">
