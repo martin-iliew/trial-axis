@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -245,6 +246,14 @@ export default function MatchResultCard({
             </Badge>
             {inquiry?.subject && (
               <Caption className="text-secondary">— {inquiry.subject}</Caption>
+            )}
+            {inquiry && inquiry.status !== "open" && (
+              <Link
+                href={`/cro/inquiries/${inquiry.id}`}
+                className="body-small text-secondary hover:underline"
+              >
+                View conversation →
+              </Link>
             )}
           </div>
         ) : showInquiryForm ? (

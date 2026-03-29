@@ -1,6 +1,6 @@
 import { createServerClient } from "@/lib/supabase/server"
 
-export async function getProjectsForCro(userId: string) {
+export async function getProjectsForCro(userId: string, tab: "active" | "archived" = "active") {
   const supabase = await createServerClient()
 
   const { data: profile } = await supabase
@@ -11,11 +11,19 @@ export async function getProjectsForCro(userId: string) {
 
   if (!profile?.organization_id) return { data: [], error: null }
 
-  const { data: projects, error } = await supabase
+  let query = supabase
     .from("trial_projects")
     .select("*")
     .eq("organization_id", profile.organization_id)
     .order("created_at", { ascending: false })
+
+  if (tab === "archived") {
+    query = query.eq("status", "archived")
+  } else {
+    query = query.neq("status", "archived")
+  }
+
+  const { data: projects, error } = await query
 
   if (error) return { data: [], error: error.message }
   if (!projects || projects.length === 0) return { data: [], error: null }

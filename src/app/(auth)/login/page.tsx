@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,12 +18,15 @@ function isCRORole(role: string | undefined) {
 
 export default function LoginPage() {
   const supabase = createClient();
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
+
+  const busy = isSubmitting || demoLoading;
 
   async function onSubmit(values: LoginValues) {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -37,6 +41,17 @@ export default function LoginPage() {
 
     const role = data.user?.user_metadata.role as string;
     window.location.assign(isCRORole(role) ? "/cro/projects" : "/clinic/profile");
+  }
+
+  async function handleDemoLogin(email: string, password: string, redirectTo: string) {
+    setDemoLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      toast.error(error.message);
+      setDemoLoading(false);
+      return;
+    }
+    window.location.assign(redirectTo);
   }
 
   return (
@@ -88,10 +103,30 @@ export default function LoginPage() {
           )}
         </div>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="w-full" disabled={busy}>
           {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
       </form>
+
+      <div className="mt-6 border-t border-subtle pt-6 space-y-2">
+        <Caption className="text-secondary text-center block mb-3">Try a demo account</Caption>
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={busy}
+          onClick={() => handleDemoLogin("sponsor@demo.com", "Demo1234!", "/cro/projects")}
+        >
+          {demoLoading ? "Signing in…" : "CRO Demo"}
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={busy}
+          onClick={() => handleDemoLogin("clinic1@demo.com", "Demo1234!", "/clinic/profile")}
+        >
+          {demoLoading ? "Signing in…" : "Clinic Admin Demo"}
+        </Button>
+      </div>
     </AuthFormShell>
   );
 }

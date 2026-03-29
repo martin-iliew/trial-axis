@@ -60,6 +60,7 @@ const availabilitySchema = z.object({
   start_date: z.string().min(1, "Start date is required"),
   end_date: z.string().min(1, "End date is required"),
   type: z.enum(["available", "busy", "tentative"]),
+  slots_available: z.number().int().min(1).optional(),
   notes: z.string().optional(),
 })
 
@@ -410,7 +411,7 @@ function CertsAvailabilityTab({
               <li key={a.id} className="flex items-center justify-between rounded-xl border border-primary px-4 py-3">
                 <div className="min-w-0 flex-1 pr-3">
                   <BodySmall className="truncate text-primary">{a.start_date} → {a.end_date}</BodySmall>
-                  <Caption className="truncate text-secondary capitalize">{a.type}{a.notes ? ` · ${a.notes}` : ""}</Caption>
+                  <Caption className="truncate text-secondary capitalize">{a.type}{a.slots_available != null ? ` · ${a.slots_available} patient slots` : ""}{a.notes ? ` · ${a.notes}` : ""}</Caption>
                 </div>
                 <button
                   onClick={() => handleDeleteAvailability(a.id)}
@@ -452,6 +453,21 @@ function CertsAvailabilityTab({
               <option value="busy">Busy</option>
               <option value="tentative">Tentative</option>
             </select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="slots_available">Patient slots available</Label>
+            <Input
+              id="slots_available"
+              type="number"
+              min={1}
+              placeholder="e.g. 20 (optional)"
+              {...availForm.register("slots_available", { valueAsNumber: true })}
+            />
+            {availForm.formState.errors.slots_available && (
+              <Caption className="text-icon-status-danger">
+                {availForm.formState.errors.slots_available.message}
+              </Caption>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="avail_notes">Notes</Label>

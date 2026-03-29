@@ -11,6 +11,7 @@ import { Heading5, Heading6, Body, BodySmall, Caption } from "@/components/ui/ty
 import Link from "next/link"
 import RequirementsSection from "./components/RequirementsSection"
 import RunMatchButton from "./components/RunMatchButton"
+import ArchiveDeleteActions from "./components/ArchiveDeleteActions"
 
 const statusColors: Record<string, string> = {
   draft: "bg-surface-level-2 text-secondary",
@@ -72,7 +73,10 @@ export default async function ProjectDetailPage({
             )}
           </div>
         </div>
-        <Badge className={statusColors[project.status] ?? ""}>{project.status}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge className={statusColors[project.status] ?? ""}>{project.status}</Badge>
+          <ArchiveDeleteActions projectId={id} status={project.status} />
+        </div>
       </div>
 
       {project.description && (
