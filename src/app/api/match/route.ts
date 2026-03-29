@@ -64,19 +64,34 @@ function scoreCertification(cp: ClinicProfile, reqs: Requirement[]): number {
 }
 
 function scoreAvailability(cp: ClinicProfile, trial: TrialProject): number {
-  let availPoints = 0
-  const capacityPoints = cp.clinic.patient_capacity && cp.clinic.patient_capacity > 0 ? 5 : 0
+  // No trial dates → clinic is always eligible
+  if (!trial.start_date || !trial.end_date) return 15
 
-  if (!trial.start_date || !trial.end_date) {
-    availPoints = 10
-  } else {
-    const hasOverlap = cp.availability.some(
-      (a) => a.type === "available" && a.start_date <= trial.end_date! && trial.start_date! <= a.end_date
-    )
-    availPoints = hasOverlap ? 10 : 0
+  const overlappingWindows = cp.availability.filter(
+    (a) =>
+      a.type === "available" &&
+      a.start_date <= trial.end_date! &&
+      trial.start_date! <= a.end_date
+  )
+
+  if (overlappingWindows.length === 0) return 0
+
+  const target = trial.target_enrollment
+  if (!target || target <= 0) return 15
+
+  // Find the best (highest) slots_available across overlapping windows
+  const slots = overlappingWindows
+    .map((a) => (a as typeof a & { slots_available?: number | null }).slots_available)
+    .filter((s): s is number => s != null && s > 0)
+
+  if (slots.length === 0) {
+    // Overlap exists but no slot count declared — partial credit
+    return 8
   }
 
-  return availPoints + capacityPoints
+  const bestSlots = Math.max(...slots)
+  if (bestSlots >= target) return 15
+  return Math.max(3, Math.round((bestSlots / target) * 15))
 }
 
 function scoreGeographic(cp: ClinicProfile, trial: TrialProject): number {
