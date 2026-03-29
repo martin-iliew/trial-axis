@@ -9,8 +9,8 @@ import InquiryResponseForm from "./components/InquiryResponseForm"
 const statusColors: Record<string, string> = {
   open: "bg-surface-status-warning text-icon-status-warning",
   in_progress: "bg-surface-status-info text-icon-status-info",
-  closed: "bg-surface-level-2 text-tertiary",
-  withdrawn: "bg-surface-level-2 text-tertiary",
+  closed: "bg-surface-status-success text-icon-status-success",
+  withdrawn: "bg-surface-status-danger text-icon-status-danger",
 }
 
 export default async function InquiryDetailPage({
@@ -40,8 +40,16 @@ export default async function InquiryDetailPage({
     therapeutic_areas: { name: string } | null
   } | null
 
-  const sponsor = inquiry.sponsor as { first_name: string; last_name: string } | null
+  const croContact = inquiry.cro as { first_name: string; last_name: string } | null
   const matchScore = (inquiry.match_result as Record<string, unknown>)?.overall_score as number | undefined
+  const primaryMessage = inquiry.messages.find((message) => message.type === "text")?.content
+  const latestStatusUpdate = [...inquiry.messages]
+    .reverse()
+    .find((message) => message.type === "status_update")?.content
+  const geographicPreference =
+    trial && "geographic_preference" in trial && typeof trial.geographic_preference === "string"
+      ? trial.geographic_preference
+      : null
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
@@ -52,7 +60,7 @@ export default async function InquiryDetailPage({
         <div>
           <Heading5>{trial?.title ?? "Trial Inquiry"}</Heading5>
           <div className="mt-1 flex items-center gap-2">
-            {sponsor && <BodySmall className="text-secondary">From {sponsor.first_name} {sponsor.last_name}</BodySmall>}
+            {croContact && <BodySmall className="text-secondary">From {croContact.first_name} {croContact.last_name}</BodySmall>}
             <Caption className="text-tertiary">{new Date(inquiry.created_at).toLocaleDateString()}</Caption>
           </div>
         </div>
@@ -78,13 +86,13 @@ export default async function InquiryDetailPage({
             {trial.target_enrollment && (
               <div>
                 <Caption className="text-secondary">Patient Count</Caption>
-                <BodySmall className="font-medium">{trial.target_enrollment}</BodySmall>
+                <BodySmall>{trial.target_enrollment}</BodySmall>
               </div>
             )}
-            {trial.geographic_preference && (
+            {geographicPreference && (
               <div>
                 <Caption className="text-secondary">Geographic Preference</Caption>
-                <BodySmall>{trial.geographic_preference}</BodySmall>
+                <BodySmall>{geographicPreference}</BodySmall>
               </div>
             )}
             {trial.start_date && (
@@ -105,8 +113,8 @@ export default async function InquiryDetailPage({
       )}
 
       <div className="mb-6 rounded-2xl border border-primary p-4">
-        <Caption className="mb-2 font-semibold uppercase text-secondary">Message from Sponsor</Caption>
-        <BodySmall>{inquiry.messages[0]?.content ?? inquiry.subject}</BodySmall>
+        <Heading9 className="mb-2 uppercase text-secondary">Message from CRO</Heading9>
+        <BodySmall>{primaryMessage ?? inquiry.subject}</BodySmall>
       </div>
 
       {inquiry.status === "open" ? (
@@ -115,11 +123,7 @@ export default async function InquiryDetailPage({
         <div className="rounded-2xl border border-primary p-4">
           <Heading9 className="mb-2 uppercase text-secondary">Your Response</Heading9>
           <Badge className={statusColors[inquiry.status] ?? ""}>{inquiry.status}</Badge>
-          {inquiry.messages
-            .filter((m) => m.sender_id !== inquiry.created_by)
-            .map((m) => (
-              <BodySmall key={m.id} className="mt-2">{m.content}</BodySmall>
-            ))}
+          {latestStatusUpdate && <BodySmall className="mt-2">{latestStatusUpdate}</BodySmall>}
         </div>
       )}
     </div>

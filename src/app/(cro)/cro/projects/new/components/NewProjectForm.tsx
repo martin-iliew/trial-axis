@@ -17,10 +17,7 @@ const schema = z.object({
   description: z.string().optional(),
   therapeutic_area_id: z.string().optional(),
   phase: z.string().optional(),
-  target_enrollment: z.preprocess(
-    (v) => (v === '' || v === null || (typeof v === 'number' && isNaN(v)) ? undefined : Number(v)),
-    z.number().positive().optional()
-  ),
+  target_enrollment: z.number().positive().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   geographic_preference: z.string().optional(),
@@ -41,25 +38,25 @@ export default function NewProjectForm({ areas }: { areas: Tables<"therapeutic_a
   async function onSubmit(values: FormValues) {
     const result = await createTrialProject({
       title: values.title,
-      description: values.description,
-      therapeutic_area_id: values.therapeutic_area_id,
-      phase: values.phase,
-      target_enrollment: values.target_enrollment,
-      start_date: values.start_date,
-      end_date: values.end_date,
-      geographic_preference: values.geographic_preference,
+      description: values.description || undefined,
+      therapeutic_area_id: values.therapeutic_area_id || undefined,
+      phase: values.phase || undefined,
+      target_enrollment: values.target_enrollment || undefined,
+      start_date: values.start_date || undefined,
+      end_date: values.end_date || undefined,
+      geographic_preference: values.geographic_preference || undefined,
     })
 
     if (result.error) {
       toast.error(result.error)
     } else if (result.data) {
-      router.push(`/sponsor/projects/${result.data.id}`)
+      router.push(`/cro/projects/${result.data.id}`)
     }
   }
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8">
-      <Heading5 className="mb-6">New Trial Project</Heading5>
+      <Heading5 className="mb-6">New CRO Study</Heading5>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">

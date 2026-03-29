@@ -50,7 +50,7 @@ export default function InquiryResponseForm({ inquiryId }: { inquiryId: string }
             id="response_message"
             value={responseMessage}
             onChange={(e) => setResponseMessage(e.target.value)}
-            placeholder="Share a message with the sponsor..."
+            placeholder="Share a message with the CRO team..."
           />
         </div>
         {showDeclineReason && (

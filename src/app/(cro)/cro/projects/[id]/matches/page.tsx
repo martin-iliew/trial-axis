@@ -36,7 +36,7 @@ export default async function MatchResultsPage({
     <div className="container mx-auto max-w-4xl px-4 py-8">
       <div className="mb-6">
         <Link
-          href={`/sponsor/projects/${id}`}
+          href={`/cro/projects/${id}`}
           className="body-small text-secondary hover:underline"
         >
           ← Back to project
@@ -72,7 +72,7 @@ export default async function MatchResultsPage({
                 matchResult={result}
                 clinicName={clinic?.name ?? "Unknown"}
                 clinicCity={clinic?.city ?? ""}
-                inquiry={(inquiry ?? null) as import("@/types").Tables<"inquiries"> | null}
+                inquiry={inquiry ?? null}
               />
             )
           })}

@@ -2,6 +2,10 @@ import Link from "next/link";
 import { createServerClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 
+function isCRORole(role: string | undefined) {
+  return role === "cro";
+}
+
 async function logout() {
   "use server";
   const supabase = await createServerClient();
@@ -21,28 +25,37 @@ export default async function Navbar() {
     <nav className="border-b border-primary bg-surface-level-1 px-6 py-4">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link href="/" className="heading-7 text-primary">
-          TrialMatch
+          TrialAxis
         </Link>
 
         <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-          {role === "clinic_admin" ? (
+          {isCRORole(role) && (
             <>
-              <Link href="/clinic/profile">
-                <Button variant="outline" size="sm">My Profile</Button>
+              <Link href="/cro/projects">
+                <Button variant="outline" size="sm">
+                  Study Portfolio
+                </Button>
               </Link>
-              <Link href="/clinic/inquiries">
-                <Button variant="outline" size="sm">Inquiries</Button>
+              <Link href="/cro/projects/new">
+                <Button variant="outline" size="sm">
+                  New Study
+                </Button>
               </Link>
             </>
-          ) : (
-            <Link href="/clinics" className="hidden sm:block">
-              <Button variant="outline" size="sm">Clinics</Button>
-            </Link>
           )}
-          {role === "sponsor" && (
-            <Link href="/sponsor/projects">
-              <Button variant="outline" size="sm">My Projects</Button>
-            </Link>
+          {role === "clinic_admin" && (
+            <>
+              <Link href="/clinic/profile">
+                <Button variant="outline" size="sm">
+                  My Profile
+                </Button>
+              </Link>
+              <Link href="/clinic/inquiries">
+                <Button variant="outline" size="sm">
+                  Inquiries
+                </Button>
+              </Link>
+            </>
           )}
 
           {user ? (

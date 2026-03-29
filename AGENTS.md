@@ -1,8 +1,8 @@
-# TrialMatch — Project Guide
+# TrialAxis — Project Guide
 
 ## Purpose
 
-TrialMatch is a clinical trial site matching MVP. Two roles: `sponsor` (pharmaceutical companies posting trials) and `clinic_admin` (clinic staff managing site profiles and responding to inquiries).
+TrialAxis is a clinical trial site matching MVP. Two roles: `sponsor` (pharmaceutical companies posting trials) and `clinic_admin` (clinic staff managing site profiles and responding to inquiries).
 
 This file is for AI agents starting new work in this project. Read it to understand:
 
@@ -286,39 +286,39 @@ If a semantic token is missing:
 
 ## Naming Conventions
 
-| Artifact                    | Convention                       | Example                                      |
-| --------------------------- | -------------------------------- | -------------------------------------------- |
+| Artifact                    | Convention                       | Example                                       |
+| --------------------------- | -------------------------------- | --------------------------------------------- |
 | Page                        | `page.tsx` inside route folder   | `src/app/(sponsor)/sponsor/projects/page.tsx` |
 | Layout                      | `layout.tsx` inside route folder | `src/app/(sponsor)/layout.tsx`                |
-| Server Action file          | `actions.ts` in feature folder   | `src/features/auth/actions.ts`               |
-| Base UI primitive           | lowercase shadcn-style           | `button.tsx`, `dialog.tsx`                   |
-| Reusable composed component | `PascalCase.tsx`                 | `UserMenu.tsx`                               |
-| Hook                        | `useX.ts`                        | `useCurrentUser.ts`                          |
-| Feature folder              | `kebab-case`                     | `src/features/auth/`, `src/features/clinics/`|
-| Utility file                | `camelCase.ts`                   | `formatDate.ts`                              |
-| Supabase helper             | descriptive `.ts`                | `src/lib/supabase/server.ts`                 |
-| Feature schema              | `schemas.ts` in feature folder   | `src/features/projects/schemas.ts`           |
+| Server Action file          | `actions.ts` in feature folder   | `src/features/auth/actions.ts`                |
+| Base UI primitive           | lowercase shadcn-style           | `button.tsx`, `dialog.tsx`                    |
+| Reusable composed component | `PascalCase.tsx`                 | `UserMenu.tsx`                                |
+| Hook                        | `useX.ts`                        | `useCurrentUser.ts`                           |
+| Feature folder              | `kebab-case`                     | `src/features/auth/`, `src/features/clinics/` |
+| Utility file                | `camelCase.ts`                   | `formatDate.ts`                               |
+| Supabase helper             | descriptive `.ts`                | `src/lib/supabase/server.ts`                  |
+| Feature schema              | `schemas.ts` in feature folder   | `src/features/projects/schemas.ts`            |
 
 ---
 
 ## What Goes Where
 
-| Need to...                          | Put it in                                   |
-| ----------------------------------- | ------------------------------------------- |
-| Add a page                          | `src/app/{route}/page.tsx`                  |
-| Add a layout or shell               | `src/app/{route}/layout.tsx`                |
-| Add feature-scoped UI and logic     | `src/features/{feature}/`                   |
-| Add a base reusable primitive       | `src/components/ui/`                        |
-| Add a shared composed component     | `src/components/common/`                    |
-| Add shell chrome (nav, sidebar)     | `src/components/layout/`                    |
-| Add a Server Action                 | `src/features/{feature}/actions.ts`         |
-| Add a client-side hook              | `src/hooks/` or `src/features/{feature}/`   |
-| Add an API route handler            | `src/app/api/{route}/route.ts`              |
-| Add query client or setup helpers   | `src/lib/`                                  |
-| Add Supabase helpers                | `src/lib/supabase/`                         |
-| Add browser runtime config          | `src/config/`                               |
-| Add project-wide types              | `src/types/`                                |
-| Add feature validation schemas      | `src/features/{feature}/schemas.ts`         |
+| Need to...                        | Put it in                                 |
+| --------------------------------- | ----------------------------------------- |
+| Add a page                        | `src/app/{route}/page.tsx`                |
+| Add a layout or shell             | `src/app/{route}/layout.tsx`              |
+| Add feature-scoped UI and logic   | `src/features/{feature}/`                 |
+| Add a base reusable primitive     | `src/components/ui/`                      |
+| Add a shared composed component   | `src/components/common/`                  |
+| Add shell chrome (nav, sidebar)   | `src/components/layout/`                  |
+| Add a Server Action               | `src/features/{feature}/actions.ts`       |
+| Add a client-side hook            | `src/hooks/` or `src/features/{feature}/` |
+| Add an API route handler          | `src/app/api/{route}/route.ts`            |
+| Add query client or setup helpers | `src/lib/`                                |
+| Add Supabase helpers              | `src/lib/supabase/`                       |
+| Add browser runtime config        | `src/config/`                             |
+| Add project-wide types            | `src/types/`                              |
+| Add feature validation schemas    | `src/features/{feature}/schemas.ts`       |
 
 ---
 
@@ -361,20 +361,20 @@ If a new visual pattern is needed and no token exists:
 
 ### Tables
 
-| Table                    | Purpose                                    | Key FKs / Relations                      | RLS                      |
-| ------------------------ | ------------------------------------------ | ---------------------------------------- | ------------------------ |
-| `profiles`               | User profile, role                         | `id` → `auth.users`                     | Own row only             |
-| `clinics`                | Clinic site details, location, capacity    | `user_id` → `auth.users`                | Owner + matched sponsors |
-| `clinic_specializations` | Clinic↔therapeutic area junction           | `clinic_id` → `clinics`, `therapeutic_area_id` → `therapeutic_areas` | Clinic owner only |
-| `equipment`              | Equipment inventory per clinic             | `clinic_id` → `clinics`                 | Clinic owner only        |
-| `certifications`         | Certification records per clinic           | `clinic_id` → `clinics`                 | Clinic owner only        |
-| `clinic_availability`    | Availability windows + capacity            | `clinic_id` → `clinics`                 | Clinic owner only        |
-| `therapeutic_areas`      | Lookup: oncology, cardiology, etc.         | —                                        | Public read              |
-| `trial_projects`         | Sponsor's trial project definition         | `sponsor_user_id` → `auth.users`        | Owner only               |
-| `trial_requirements`     | Criteria for a trial project               | `trial_project_id` → `trial_projects`   | Owner only               |
-| `match_results`          | Algorithm output: clinic↔project score     | `trial_project_id`, `clinic_id`          | Both parties             |
-| `partnership_inquiries`  | Sponsor inquiry to a matched clinic        | `match_result_id` → `match_results`     | Both parties             |
-| `contact_inquiries`      | Landing page contact form submissions      | —                                        | Public insert            |
+| Table                    | Purpose                                 | Key FKs / Relations                                                  | RLS                      |
+| ------------------------ | --------------------------------------- | -------------------------------------------------------------------- | ------------------------ |
+| `profiles`               | User profile, role                      | `id` → `auth.users`                                                  | Own row only             |
+| `clinics`                | Clinic site details, location, capacity | `user_id` → `auth.users`                                             | Owner + matched sponsors |
+| `clinic_specializations` | Clinic↔therapeutic area junction        | `clinic_id` → `clinics`, `therapeutic_area_id` → `therapeutic_areas` | Clinic owner only        |
+| `equipment`              | Equipment inventory per clinic          | `clinic_id` → `clinics`                                              | Clinic owner only        |
+| `certifications`         | Certification records per clinic        | `clinic_id` → `clinics`                                              | Clinic owner only        |
+| `clinic_availability`    | Availability windows + capacity         | `clinic_id` → `clinics`                                              | Clinic owner only        |
+| `therapeutic_areas`      | Lookup: oncology, cardiology, etc.      | —                                                                    | Public read              |
+| `trial_projects`         | Sponsor's trial project definition      | `sponsor_user_id` → `auth.users`                                     | Owner only               |
+| `trial_requirements`     | Criteria for a trial project            | `trial_project_id` → `trial_projects`                                | Owner only               |
+| `match_results`          | Algorithm output: clinic↔project score  | `trial_project_id`, `clinic_id`                                      | Both parties             |
+| `partnership_inquiries`  | Sponsor inquiry to a matched clinic     | `match_result_id` → `match_results`                                  | Both parties             |
+| `contact_inquiries`      | Landing page contact form submissions   | —                                                                    | Public insert            |
 
 ### Enums
 
@@ -383,6 +383,7 @@ If a new visual pattern is needed and no token exists:
 ### TypeScript Types
 
 Key types exported from `@/types`:
+
 - `Clinic`, `TrialProject`, `TrialRequirement`
 - `MatchResult`, `PartnershipInquiry`
 - `TherapeuticArea`, `Profile`
@@ -396,13 +397,11 @@ Key types exported from `@/types`:
 ### Server Client (Server Components, Server Actions, Route Handlers)
 
 ```ts
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClient } from "@/lib/supabase/server";
 
 export async function getProjects() {
-  const supabase = await createServerClient()
-  const { data, error } = await supabase
-    .from('trial_projects')
-    .select('*')
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.from("trial_projects").select("*");
   // handle error, return data
 }
 ```
@@ -410,17 +409,17 @@ export async function getProjects() {
 ### Browser Client (Client Components)
 
 ```ts
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from "@/lib/supabase/client";
 
-const supabase = createClient()
+const supabase = createClient();
 ```
 
 ### Middleware (route protection)
 
 ```ts
 // middleware.ts at project root
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 ```
 
 Key rules:
@@ -435,11 +434,11 @@ Key rules:
 
 ## Auth & Roles
 
-| Role           | Home route     | Accessible routes                                        |
-| -------------- | -------------- | -------------------------------------------------------- |
-| `sponsor`      | `/sponsor/projects` | `/sponsor/*`                                        |
-| `clinic_admin` | `/clinic/profile`   | `/clinic/*`                                         |
-| visitor (anon) | `/`                 | `/`, `/login`, `/register`                          |
+| Role           | Home route          | Accessible routes          |
+| -------------- | ------------------- | -------------------------- |
+| `sponsor`      | `/sponsor/projects` | `/sponsor/*`               |
+| `clinic_admin` | `/clinic/profile`   | `/clinic/*`                |
+| visitor (anon) | `/`                 | `/`, `/login`, `/register` |
 
 - `middleware.ts` enforces route access based on auth state and role.
 - Role is stored in `user_metadata.role` (Supabase Auth) and mirrored in `profiles.role`.
@@ -452,6 +451,7 @@ Key rules:
 ## MVP User Flows
 
 ### Sponsor Flow
+
 1. Register as sponsor → create organization
 2. Create trial project → define requirements (therapeutic area, equipment, patient volume)
 3. Run matching → view ranked clinic matches with scores
@@ -459,6 +459,7 @@ Key rules:
 5. Exchange messages within inquiry thread
 
 ### Clinic Admin Flow
+
 1. Register as clinic admin → create organization + clinic profile
 2. Manage clinic profile (location, capacity, therapeutic areas)
 3. Add equipment inventory and availability windows
@@ -466,15 +467,17 @@ Key rules:
 5. Track inquiry status and message history
 
 ### Visitor Flow
-1. Land on marketing page → learn about TrialMatch
+
+1. Land on marketing page → learn about TrialAxis
 2. Navigate to `/register` → choose role (sponsor or clinic admin)
 3. Contact via landing page form (no auth required)
 
 ## Component Rules
-  - Always componentize UI — break everything into components, never leave raw markup in pages.
-  - If a component is used by only one route or page, co-locate it in that route's folder under `components/*` (e.g.
+
+- Always componentize UI — break everything into components, never leave raw markup in pages.
+- If a component is used by only one route or page, co-locate it in that route's folder under `components/*` (e.g.
   `src/app/(sponsor)/sponsor/projects/components/ProjectCard.tsx`).
-  - Always use 21st.dev (`@21st-dev/magic`) or shadcn/ui (or both) as the component source — never build from scratch
+- Always use 21st.dev (`@21st-dev/magic`) or shadcn/ui (or both) as the component source — never build from scratch
   when a quality primitive exists.
-  - All components must look visually consistent with each other — follow the same design language.
-  - Always use the design system tokens — no exceptions, no one-off styles.
+- All components must look visually consistent with each other — follow the same design language.
+- Always use the design system tokens — no exceptions, no one-off styles.

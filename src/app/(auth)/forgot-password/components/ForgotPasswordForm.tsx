@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
-import AuthFormShell from "@/components/common/AuthFormShell"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { BodySmall, Caption, Label } from "@/components/ui/typography"
-import { createRecoveryClient } from "@/lib/supabase/recovery"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import AuthFormShell from "@/components/common/AuthFormShell";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { BodySmall, Caption, Label } from "@/components/ui/typography";
+import { createRecoveryClient } from "@/lib/supabase/recovery";
 import {
   forgotPasswordSchema,
   type ForgotPasswordValues,
-} from "@/features/auth/schemas"
-import { buildResetPasswordRedirectUrl } from "@/features/auth/resetPassword"
+} from "@/features/auth/schemas";
+import { buildResetPasswordRedirectUrl } from "@/features/auth/resetPassword";
 
 export default function ForgotPasswordForm() {
-  const [supabase] = useState(() => createRecoveryClient())
-  const [emailSent, setEmailSent] = useState(false)
+  const [supabase] = useState(() => createRecoveryClient());
+  const [emailSent, setEmailSent] = useState(false);
   const {
     register,
     handleSubmit,
@@ -25,22 +25,24 @@ export default function ForgotPasswordForm() {
     formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordValues>({
     resolver: zodResolver(forgotPasswordSchema),
-  })
+  });
 
   async function onSubmit(values: ForgotPasswordValues) {
-    const redirectTo = buildResetPasswordRedirectUrl(window.location.origin)
+    const redirectTo = buildResetPasswordRedirectUrl(window.location.origin);
     const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
       redirectTo,
-    })
+    });
 
     if (error) {
-      toast.error(error.message)
-      return
+      toast.error(error.message);
+      return;
     }
 
-    setEmailSent(true)
-    reset()
-    toast.success("If an account exists for that email, we've sent a reset link.")
+    setEmailSent(true);
+    reset();
+    toast.success(
+      "If an account exists for that email, we've sent a reset link.",
+    );
   }
 
   return (
@@ -62,7 +64,9 @@ export default function ForgotPasswordForm() {
             {...register("email")}
           />
           {errors.email ? (
-            <Caption className="text-icon-status-danger">{errors.email.message}</Caption>
+            <Caption className="text-icon-status-danger">
+              {errors.email.message}
+            </Caption>
           ) : (
             <Caption className="text-secondary">
               We&apos;ll send the reset link to the email on your account.
@@ -72,7 +76,8 @@ export default function ForgotPasswordForm() {
 
         {emailSent && (
           <BodySmall className="text-secondary">
-            Check your inbox and spam folder. The email link will take you to a secure reset screen in TrialMatch.
+            Check your inbox and spam folder. The email link will take you to a
+            secure reset screen in TrialAxis.
           </BodySmall>
         )}
 
@@ -81,5 +86,5 @@ export default function ForgotPasswordForm() {
         </Button>
       </form>
     </AuthFormShell>
-  )
+  );
 }

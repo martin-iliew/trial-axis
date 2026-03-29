@@ -12,7 +12,7 @@ export const registerSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Enter a valid email"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["sponsor", "clinic_admin"]),
+  role: z.enum(["cro", "clinic_admin"]),
 })
 
 export type RegisterValues = z.infer<typeof registerSchema>

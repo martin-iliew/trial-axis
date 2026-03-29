@@ -1,4 +1,4 @@
-# TrialMatch — 7–8 Hour Execution Plan
+# TrialAxis — 7–8 Hour Execution Plan
 
 **Team**: 3 people — 1 UI/UX dev, 2 backend devs (full-stack capable)
 **Target**: Live URL on Vercel + Supabase cloud
@@ -8,11 +8,11 @@
 
 ## Ownership Lanes
 
-| Lane | Person | Owns |
-|------|--------|------|
-| **DB** | Backend Dev 1 | Schema, Supabase setup/cloud, auth middleware, matching algorithm |
-| **Logic** | Backend Dev 2 | Seed data, Server Actions, all data layer for features |
-| **UI** | UI Dev | All pages, components, forms, design system |
+| Lane      | Person        | Owns                                                              |
+| --------- | ------------- | ----------------------------------------------------------------- |
+| **DB**    | Backend Dev 1 | Schema, Supabase setup/cloud, auth middleware, matching algorithm |
+| **Logic** | Backend Dev 2 | Seed data, Server Actions, all data layer for features            |
+| **UI**    | UI Dev        | All pages, components, forms, design system                       |
 
 ---
 
@@ -23,6 +23,7 @@
 > DB Dev starts schema the moment everyone sits down. No distractions until `supabase gen types` is done.
 
 ### DB Dev
+
 - [ ] Create Supabase cloud project (supabase.com dashboard)
 - [ ] `cd web && npx supabase init && npx supabase link --project-ref <ref>`
 - [ ] Write `supabase/schema.sql` — all 11 tables (profiles, therapeutic_areas, clinics, clinic_specializations, equipment, certifications, clinic_availability, trial_projects, trial_requirements, match_results, partnership_inquiries, contact_inquiries)
@@ -32,6 +33,7 @@
 - [ ] Deploy skeleton to Vercel (connect repo, add `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` env vars) — validates pipeline early
 
 ### Logic Dev
+
 - [ ] `npm install @supabase/ssr @supabase/supabase-js react-hook-form @hookform/resolvers zod @tanstack/react-query sonner`
 - [ ] Create `lib/supabase/client.ts` (browser client — `createBrowserClient`)
 - [ ] Create `lib/supabase/server.ts` (server client — `createServerClient`)
@@ -43,6 +45,7 @@
 - [ ] Apply seed after schema push: `npx supabase db push` reruns seed
 
 ### UI Dev
+
 - [ ] `npx shadcn add dialog select form tabs label textarea separator` (button/card/badge/input/alert already exist)
 - [ ] Add `sonner` toast to root layout
 - [ ] Wire `QueryClientProvider` + `<Toaster />` into `app/layout.tsx`
@@ -56,6 +59,7 @@
 **Exit criterion: Can register as Sponsor and ClinicAdmin, log in as either, middleware redirects correctly**
 
 ### DB Dev
+
 - [ ] `middleware.ts` — session check via `createServerClient`, role-based redirect:
   - No session → `/login`
   - `sponsor` role on `/clinic/*` → `/sponsor/projects`
@@ -66,6 +70,7 @@
 - [ ] Test both flows against live Supabase cloud
 
 ### Logic Dev
+
 - [ ] `features/clinic-profile/actions.ts` — Server Actions:
   - `upsertClinic(data)` — insert/update `clinics` row for `auth.uid()`
   - `upsertSpecializations(clinicId, areaIds)` — replace `clinic_specializations`
@@ -75,6 +80,7 @@
 - [ ] `app/(clinic)/profile/page.tsx` — Server Component: load clinic + equipment + certs + availability for `auth.uid()`
 
 ### UI Dev
+
 - [ ] `app/(auth)/login/page.tsx` — `AuthFormShell` + RHF/Zod form (email, password)
 - [ ] `app/(auth)/register/page.tsx` — `AuthFormShell` + RHF/Zod form (first name, last name, email, password, role picker toggle)
 - [ ] `app/(clinic)/profile/page.tsx` — 3-tab layout:
@@ -90,6 +96,7 @@
 **Exit criterion: Sponsor can create project → run match → view results → send inquiry. Clinic can accept/decline.**
 
 ### DB Dev
+
 - [ ] `app/api/match/route.ts` — POST endpoint, takes `{ trial_project_id }`:
   1. Load trial project + all requirements from DB
   2. Load all clinics with specializations, equipment, certifications, availability
@@ -109,6 +116,7 @@
   - `addRequirement(data)` / `deleteRequirement(id)`
 
 ### Logic Dev
+
 - [ ] `features/inquiries/actions.ts`:
   - `sendInquiry({ matchResultId, message, notes })` — insert `partnership_inquiries` status=pending, update `match_results.status` to inquiry_sent
   - `acceptInquiry(id, message?)` — update status=accepted
@@ -120,6 +128,7 @@
 - [ ] ~~`app/contact/page.tsx`~~ — **deferred to post-MVP** (contact form cut; visitor CTA goes to `/register`)
 
 ### UI Dev
+
 - [ ] `app/(sponsor)/projects/page.tsx` — project list cards with status badge, "New Trial Project" button
 - [ ] `app/(sponsor)/projects/new/page.tsx` — creation form: title, description, therapeutic area select, phase select, patient count, start/end dates, geographic preference
 - [ ] `app/(sponsor)/projects/[id]/page.tsx` — project detail:
@@ -140,17 +149,20 @@
 **Exit criterion: Full demo story works on live URL start-to-finish without errors**
 
 ### DB Dev
+
 - [ ] Confirm Vercel env vars set: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - [ ] Run `next build` locally — fix all TypeScript/build errors before pushing
 - [ ] Run full sponsor E2E on live URL: register → create project → add requirements → run match → send inquiry
 - [ ] Fix any production-only runtime errors
 
 ### Logic Dev
+
 - [ ] Run matching algorithm against all 3 seed trial projects — confirm results are varied (different clinics rank #1 for different trials)
 - [ ] Validate seed data completeness: every demo account logs in, every clinic has equipment + at least 1 cert
 - [ ] Test clinic E2E on live URL: log in → complete profile → check inbox → accept inquiry
 
 ### UI Dev
+
 - [ ] Suspense + skeleton loaders on all Server Component pages (project list, match results, inquiry inbox)
 - [ ] Empty states: zero match results ("No clinics meet your required criteria"), empty project list, empty inquiry inbox
 - [ ] Toast notifications: inquiry sent, profile saved, requirement added, inquiry accepted/declined
@@ -162,23 +174,23 @@
 
 If Wave 3 runs long, cut in this order. **Never cut the demo story.**
 
-| Order | Cut | Keep |
-|-------|-----|------|
-| First | Edit project (just create new), public clinic browse `/clinics` | Auth, matching, inquiry flow |
-| Second | Profile completion indicator, score color coding | Score numbers + breakdown visible |
-| Last | Toast notifications, skeleton loaders | Core E2E flow on live URL |
+| Order  | Cut                                                             | Keep                              |
+| ------ | --------------------------------------------------------------- | --------------------------------- |
+| First  | Edit project (just create new), public clinic browse `/clinics` | Auth, matching, inquiry flow      |
+| Second | Profile completion indicator, score color coding                | Score numbers + breakdown visible |
+| Last   | Toast notifications, skeleton loaders                           | Core E2E flow on live URL         |
 
 ---
 
 ## Risk Register
 
-| Risk | Impact | Mitigation |
-|------|--------|-----------|
-| Schema takes >1.5h | Delays everything | DB Dev on schema only in Wave 1 — zero distractions |
-| Vercel build fails on env vars | Demo URL broken | Deploy skeleton in Wave 1 to validate pipeline before features exist |
-| Type mismatch after seed applied | Runtime errors | Regenerate types after seed is applied, not before |
-| Matching produces all-same scores | Unconvincing demo | Distinct seed clinics; Logic Dev validates manually in Wave 4 |
-| Someone blocked mid-wave | Wasted time | Each dev has a backlog of polish tasks to fill gaps |
+| Risk                              | Impact            | Mitigation                                                           |
+| --------------------------------- | ----------------- | -------------------------------------------------------------------- |
+| Schema takes >1.5h                | Delays everything | DB Dev on schema only in Wave 1 — zero distractions                  |
+| Vercel build fails on env vars    | Demo URL broken   | Deploy skeleton in Wave 1 to validate pipeline before features exist |
+| Type mismatch after seed applied  | Runtime errors    | Regenerate types after seed is applied, not before                   |
+| Matching produces all-same scores | Unconvincing demo | Distinct seed clinics; Logic Dev validates manually in Wave 4        |
+| Someone blocked mid-wave          | Wasted time       | Each dev has a backlog of polish tasks to fill gaps                  |
 
 ---
 

@@ -625,7 +625,7 @@ export type Database = {
       inquiry_status: "open" | "in_progress" | "closed" | "withdrawn"
       match_status: "pending" | "reviewed" | "accepted" | "rejected"
       message_type: "text" | "document" | "status_update"
-      organization_type: "sponsor" | "clinic"
+      organization_type: "cro" | "clinic"
       project_status: "draft" | "active" | "paused" | "completed" | "archived"
       requirement_type:
         | "therapeutic_area"
@@ -634,7 +634,7 @@ export type Database = {
         | "certification"
         | "geography"
         | "other"
-      user_role: "sponsor" | "clinic_admin" | "admin"
+      user_role: "cro" | "clinic_admin" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -776,7 +776,7 @@ export const Constants = {
       inquiry_status: ["open", "in_progress", "closed", "withdrawn"],
       match_status: ["pending", "reviewed", "accepted", "rejected"],
       message_type: ["text", "document", "status_update"],
-      organization_type: ["sponsor", "clinic"],
+      organization_type: ["cro", "clinic"],
       project_status: ["draft", "active", "paused", "completed", "archived"],
       requirement_type: [
         "therapeutic_area",
@@ -786,7 +786,7 @@ export const Constants = {
         "geography",
         "other",
       ],
-      user_role: ["sponsor", "clinic_admin", "admin"],
+      user_role: ["cro", "clinic_admin", "admin"],
     },
   },
 } as const

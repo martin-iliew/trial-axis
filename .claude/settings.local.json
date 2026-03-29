@@ -2,9 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(cat:*)",
-      "Bash(tree -L 3 /c/Users/TenchoBostandzhiev/source/GitHub -Tencho Bostandzhiev/TrialMatch/src -I node_modules)",
+      "Bash(tree -L 3 /c/Users/TenchoBostandzhiev/source/GitHub -Tencho Bostandzhiev/TrialAxis/src -I node_modules)",
       "Bash(npm init:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "mcp__supabase__list_projects",
+      "Bash(grep:*)",
+      "mcp__supabase__execute_sql",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__apply_migration"
     ]
   }
 }

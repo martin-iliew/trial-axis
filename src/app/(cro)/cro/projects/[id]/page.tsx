@@ -11,12 +11,11 @@ import { Heading5, Heading6, Body, BodySmall, Caption } from "@/components/ui/ty
 import Link from "next/link"
 import RequirementsSection from "./components/RequirementsSection"
 import RunMatchButton from "./components/RunMatchButton"
-import ArchiveDeleteActions from "./components/ArchiveDeleteActions"
 
 const statusColors: Record<string, string> = {
   draft: "bg-surface-level-2 text-secondary",
   active: "bg-surface-status-info text-icon-status-info",
-  paused: "bg-surface-status-warning text-icon-status-warning",
+  paused: "bg-surface-level-2 text-tertiary",
   completed: "bg-surface-status-success text-icon-status-success",
   archived: "bg-surface-level-2 text-tertiary",
 }
@@ -39,18 +38,23 @@ export default async function ProjectDetailPage({
   const { data: requirements } = await getProjectRequirements(id)
   const { data: inquiries } = await getProjectInquiries(id)
   const area = project.therapeutic_areas as { name: string } | null
+  const geographicPreference =
+    "geographic_preference" in project &&
+    typeof project.geographic_preference === "string"
+      ? project.geographic_preference
+      : null
 
   const inquiryStatusColors: Record<string, string> = {
     open: "bg-surface-status-warning text-icon-status-warning",
     in_progress: "bg-surface-status-info text-icon-status-info",
-    closed: "bg-surface-level-2 text-tertiary",
-    withdrawn: "bg-surface-level-2 text-tertiary",
+    closed: "bg-surface-status-success text-icon-status-success",
+    withdrawn: "bg-surface-status-danger text-icon-status-danger",
   }
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6">
-        <Link href="/sponsor/projects" className="body-small text-secondary hover:underline">
+        <Link href="/cro/projects" className="body-small text-secondary hover:underline">
           ← Back to projects
         </Link>
       </div>
@@ -63,8 +67,8 @@ export default async function ProjectDetailPage({
             {project.phase && (
               <BodySmall className="text-secondary">Phase {project.phase}</BodySmall>
             )}
-            {project.geographic_preference && (
-              <BodySmall className="text-secondary">{project.geographic_preference}</BodySmall>
+            {geographicPreference && (
+              <BodySmall className="text-secondary">{geographicPreference}</BodySmall>
             )}
           </div>
         </div>
@@ -78,7 +82,7 @@ export default async function ProjectDetailPage({
       <div className="mb-6 grid grid-cols-2 gap-4 rounded-2xl border border-primary p-4 sm:grid-cols-3">
         <div>
           <Caption className="text-secondary">Patient Count</Caption>
-          <BodySmall className="font-medium">
+          <BodySmall>
             {project.target_enrollment ?? "Not set"}
           </BodySmall>
         </div>
@@ -113,6 +117,7 @@ export default async function ProjectDetailPage({
                     <Caption className="text-secondary">
                       Sent {new Date(inq.created_at).toLocaleDateString()}
                     </Caption>
+                    <Caption className="mt-1 text-secondary">{inq.subject}</Caption>
                   </div>
                   <Badge className={inquiryStatusColors[inq.status] ?? ""}>
                     {inq.status}
@@ -125,13 +130,12 @@ export default async function ProjectDetailPage({
       )}
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <RunMatchButton projectId={id} hasMatches={project.status === "active"} />
+        <RunMatchButton projectId={id} />
         {project.status === "active" && (
-          <Link href={`/sponsor/projects/${id}/matches`}>
+          <Link href={`/cro/projects/${id}/matches`}>
             <Button variant="outline">View Match Results</Button>
           </Link>
         )}
-        <ArchiveDeleteActions projectId={id} status={project.status} />
       </div>
     </div>
   )

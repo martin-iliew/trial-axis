@@ -1,16 +1,18 @@
-# TrialMatch Reset Password Design
+# TrialAxis Reset Password Design
+
 **Date:** 2026-03-29
 **Status:** Approved
 
 ## Goal
 
-Add a password recovery flow that starts from `/login`, emails a Supabase recovery link, and lets the user set a new password inside TrialMatch on a dedicated reset page.
+Add a password recovery flow that starts from `/login`, emails a Supabase recovery link, and lets the user set a new password inside TrialAxis on a dedicated reset page.
 
 ---
 
 ## Scope
 
 In scope:
+
 - Add a "Forgot password?" entry point on the login screen
 - Add a guest-facing `/forgot-password` page
 - Add a guest-facing `/reset-password` page
@@ -19,6 +21,7 @@ In scope:
 - Keep all UI inside the existing auth shell and design-token system
 
 Out of scope:
+
 - Authenticated in-app password change
 - Custom email templates
 - Extra account settings pages

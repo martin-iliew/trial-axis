@@ -1,6 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+function isCRORole(role: string | undefined) {
+  return role === 'cro'
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -33,13 +37,13 @@ export async function middleware(request: NextRequest) {
   // Already-logged-in users hitting auth pages → redirect to role home
   if (user && (pathname === '/login' || pathname === '/register')) {
     const role = user.user_metadata.role as string
-    const home = role === 'sponsor' ? '/sponsor/projects' : '/clinic/profile'
+    const home = isCRORole(role) ? '/cro/projects' : '/clinic/profile'
     return NextResponse.redirect(new URL(home, request.url))
   }
 
   // Unauthenticated users hitting protected routes → login
   const isProtected =
-    pathname.startsWith('/sponsor') || pathname.startsWith('/clinic')
+    pathname.startsWith('/cro') || pathname.startsWith('/clinic')
   if (!user && isProtected) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
@@ -47,10 +51,10 @@ export async function middleware(request: NextRequest) {
   // Wrong-role access
   if (user) {
     const role = user.user_metadata.role as string
-    if (role === 'sponsor' && pathname.startsWith('/clinic')) {
-      return NextResponse.redirect(new URL('/sponsor/projects', request.url))
+    if (isCRORole(role) && pathname.startsWith('/clinic')) {
+      return NextResponse.redirect(new URL('/cro/projects', request.url))
     }
-    if (role === 'clinic_admin' && pathname.startsWith('/sponsor')) {
+    if (role === 'clinic_admin' && pathname.startsWith('/cro')) {
       return NextResponse.redirect(new URL('/clinic/profile', request.url))
     }
   }

@@ -9,8 +9,8 @@ import { Heading5, Heading9, Body, BodySmall, Caption } from "@/components/ui/ty
 const statusColors: Record<string, string> = {
   open: "bg-surface-status-warning text-icon-status-warning",
   in_progress: "bg-surface-status-info text-icon-status-info",
-  closed: "bg-surface-level-2 text-tertiary",
-  withdrawn: "bg-surface-level-2 text-tertiary",
+  closed: "bg-surface-status-success text-icon-status-success",
+  withdrawn: "bg-surface-status-danger text-icon-status-danger",
 }
 
 export default async function InquiriesPage() {
@@ -45,7 +45,7 @@ export default async function InquiriesPage() {
         <div className="rounded-2xl border border-dashed border-primary p-12 text-center">
           <Body className="text-secondary">No inquiries yet</Body>
           <BodySmall className="mt-1 text-tertiary">
-            When sponsors find your clinic through matching, their inquiries will appear here.
+            When CRO teams find your clinic through matching, their inquiries will appear here.
           </BodySmall>
         </div>
       ) : (
@@ -57,7 +57,7 @@ export default async function InquiriesPage() {
               target_enrollment: number | null
               therapeutic_areas: { name: string } | null
             } | null
-            const sponsor = inquiry.sponsor as { first_name: string; last_name: string } | null
+            const croContact = inquiry.cro as { first_name: string; last_name: string } | null
             return (
               <Link
                 key={inquiry.id}
@@ -68,8 +68,8 @@ export default async function InquiriesPage() {
                   <div className="flex-1">
                     <Heading9>{trial?.title ?? "Trial Project"}</Heading9>
                     <div className="mt-1 flex items-center gap-2">
-                      {sponsor && (
-                        <BodySmall className="text-secondary">From {sponsor.first_name} {sponsor.last_name}</BodySmall>
+                      {croContact && (
+                        <BodySmall className="text-secondary">From {croContact.first_name} {croContact.last_name}</BodySmall>
                       )}
                       {trial?.therapeutic_areas && (
                         <BodySmall className="text-secondary">{trial.therapeutic_areas.name}</BodySmall>

@@ -16,6 +16,10 @@ import {
 import { ClipboardList, Cpu, Handshake } from "lucide-react";
 import { ClipboardList, Cpu, Handshake, ArrowUpRight } from "lucide-react";
 
+function isCRORole(role: string | undefined) {
+  return role === "cro";
+}
+
 function StatCard({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-primary bg-surface-level-1 px-5 py-4 sm:flex-col sm:items-center sm:gap-1 sm:px-6 sm:py-5">
@@ -64,8 +68,9 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   const role = user?.user_metadata?.role as string | undefined;
 
-  const dashboardHref =
-    role === "sponsor" ? "/sponsor/projects" : "/clinic/profile";
+  const dashboardHref = isCRORole(role)
+    ? "/cro/projects"
+    : "/clinic/profile";
 
   return (
     <>
@@ -77,13 +82,13 @@ export default async function Home() {
           <Badge className="mb-6">Clinical Trial Site Matching</Badge>
           <LandingHero className="mb-6">
             {user
-              ? "Welcome back to TrialMatch"
+              ? "Welcome back to TrialAxis"
               : "Match clinics to trials in minutes, not months"}
           </LandingHero>
           <Body className="mx-auto mb-10 max-w-2xl text-secondary">
             {user
               ? "Pick up where you left off — manage your projects, review matches, and connect with partners."
-              : "TrialMatch connects pharmaceutical sponsors with the best-fit research sites using intelligent, criteria-based matching. Stop relying on spreadsheets and phone calls — find the right clinic, faster."}
+              : "TrialAxis connects contract research organizations with the best-fit research sites using intelligent, criteria-based matching. Stop relying on spreadsheets and phone calls — find the right clinic, faster."}
           </Body>
 
           {/* CTA — changes based on auth state */}
@@ -95,8 +100,8 @@ export default async function Home() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/register?role=sponsor">
-                <Button size="lg">Join as Sponsor</Button>
+              <Link href="/register?role=cro">
+                <Button size="lg">Join as CRO</Button>
               </Link>
               <Link href="/register?role=clinic_admin">
                 <Button variant="outline" size="lg">
@@ -157,7 +162,7 @@ export default async function Home() {
             <Heading3 className="mb-3">For Clinics</Heading3>
             <Body className="mb-8 text-secondary">
               Register your site, showcase your capabilities, and get matched
-              with relevant trials automatically. No cold outreach — sponsors
+              with relevant trials automatically. No cold outreach — CRO teams
               come to you.
             </Body>
 >>>>>>> 431bb34 (refactor: polish landing and shell ui)
@@ -177,7 +182,7 @@ export default async function Home() {
             <Heading5 className="mb-3">Explore the Network</Heading5>
             <BodySmall className="mb-6 text-secondary">
               Browse registered clinics across Bulgaria and Europe to see the
-              growing TrialMatch network.
+              growing TrialAxis network.
             </BodySmall>
             <Link href="/clinics">
               <Button variant="outline">Browse Clinics</Button>

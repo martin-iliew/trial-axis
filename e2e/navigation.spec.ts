@@ -27,6 +27,18 @@ test.describe('Navigation between auth pages', () => {
   })
 })
 
+test.describe('Not found page', () => {
+  test('renders the custom 404 page for unknown routes', async ({ page }) => {
+    await page.goto('/this-route-does-not-exist')
+    await expect(page.getByText('Page not found')).toBeVisible()
+    await expect(
+      page.getByText("You seem to have reached a page that doesn't exist or may never exist.")
+    ).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Go home' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Back to login' })).toBeVisible()
+  })
+})
+
 test.describe('Page load performance', () => {
   test('landing page loads within 5 seconds', async ({ page }) => {
     const start = Date.now()
@@ -59,5 +71,6 @@ test.describe('Responsive layout', () => {
     await expect(page.getByLabel('Last name')).toBeVisible()
     await expect(page.getByLabel('Email')).toBeVisible()
     await expect(page.getByLabel('Password')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Contract Research Organization' })).toBeVisible()
   })
 })

@@ -73,18 +73,18 @@ export async function getInquiriesForClinic(clinicId: string) {
     trial_projects: trialMap.get(m.project_id) ?? null,
   }]))
 
-  const sponsorIds = [...new Set(inquiries.map((i) => i.created_by))]
-  const { data: sponsors } = await supabase
+  const croIds = [...new Set(inquiries.map((i) => i.created_by))]
+  const { data: cros } = await supabase
     .from("profiles")
     .select("id, first_name, last_name")
-    .in("id", sponsorIds)
+    .in("id", croIds)
 
-  const sponsorMap = new Map((sponsors ?? []).map((s) => [s.id, s]))
+  const croMap = new Map((cros ?? []).map((cro) => [cro.id, cro]))
 
   const enriched = inquiries.map((inquiry) => ({
     ...inquiry,
     match_result: matchMap.get(inquiry.match_result_id) ?? null,
-    sponsor: sponsorMap.get(inquiry.created_by) ?? null,
+    cro: croMap.get(inquiry.created_by) ?? null,
   }))
 
   return { data: enriched, error: null }
@@ -136,7 +136,7 @@ export async function getInquiryDetail(inquiryId: string, clinicId: string) {
     .eq("inquiry_id", inquiryId)
     .order("created_at")
 
-  const { data: sponsor } = await supabase
+  const { data: cro } = await supabase
     .from("profiles")
     .select("id, first_name, last_name")
     .eq("id", inquiry.created_by)
@@ -149,7 +149,7 @@ export async function getInquiryDetail(inquiryId: string, clinicId: string) {
       match_result: matchResult
         ? { ...matchResult, trial_projects: trialProject }
         : null,
-      sponsor: sponsor ?? null,
+      cro: cro ?? null,
     },
     error: null,
   }

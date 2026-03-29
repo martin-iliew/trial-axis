@@ -1,16 +1,17 @@
-# TrialMatch — Migration & Refactor Design
+# TrialAxis — Migration & Refactor Design
+
 **Date:** 2026-03-28
 **Status:** Approved
 
 ## Goal
 
-Migrate all feature implementations from `TrialMatch - Copy/web` into the canonical `TrialMatch` project, rewriting every file from scratch to comply fully with CLAUDE.md conventions. Preserve all existing functionality — this is a quality pass plus migration, not a feature change.
+Migrate all feature implementations from `TrialAxis - Copy/web` into the canonical `TrialAxis` project, rewriting every file from scratch to comply fully with CLAUDE.md conventions. Preserve all existing functionality — this is a quality pass plus migration, not a feature change.
 
 ---
 
 ## Context
 
-The current `TrialMatch` project has the correct skeleton (design tokens, fonts, Supabase clients, middleware, `src/` layout) but empty feature pages. The old copy (`TrialMatch - Copy/web`) has complete feature code but violates CLAUDE.md in multiple ways. The old copy serves as a feature specification only — no code is copied verbatim.
+The current `TrialAxis` project has the correct skeleton (design tokens, fonts, Supabase clients, middleware, `src/` layout) but empty feature pages. The old copy (`TrialAxis - Copy/web`) has complete feature code but violates CLAUDE.md in multiple ways. The old copy serves as a feature specification only — no code is copied verbatim.
 
 ---
 
@@ -90,25 +91,25 @@ src/
 
 Every file applies these substitutions — no exceptions:
 
-| Old pattern | Canonical replacement |
-|---|---|
-| `bg-background` | `bg-default` |
-| `text-foreground` | `text-primary` |
-| `text-muted-foreground` | `text-secondary` |
-| `bg-muted` | `bg-subtle` |
-| `border-border` | `border-primary` |
-| `hover:bg-accent` | `hover:bg-subtle` |
-| `bg-primary` (button fill) | `bg-brand` |
-| `text-primary-foreground` | `text-on-brand` |
-| `bg-green-100 text-green-800` | `bg-surface-status-success text-icon-status-success` |
-| `bg-yellow-100 text-yellow-800` | `bg-surface-status-warning text-icon-status-warning` |
-| `bg-blue-100 text-blue-800` | `bg-surface-status-info text-icon-status-info` |
-| `bg-red-100 / text-red-500` | `bg-surface-status-danger text-icon-status-danger` |
+| Old pattern                                | Canonical replacement                                   |
+| ------------------------------------------ | ------------------------------------------------------- |
+| `bg-background`                            | `bg-default`                                            |
+| `text-foreground`                          | `text-primary`                                          |
+| `text-muted-foreground`                    | `text-secondary`                                        |
+| `bg-muted`                                 | `bg-subtle`                                             |
+| `border-border`                            | `border-primary`                                        |
+| `hover:bg-accent`                          | `hover:bg-subtle`                                       |
+| `bg-primary` (button fill)                 | `bg-brand`                                              |
+| `text-primary-foreground`                  | `text-on-brand`                                         |
+| `bg-green-100 text-green-800`              | `bg-surface-status-success text-icon-status-success`    |
+| `bg-yellow-100 text-yellow-800`            | `bg-surface-status-warning text-icon-status-warning`    |
+| `bg-blue-100 text-blue-800`                | `bg-surface-status-info text-icon-status-info`          |
+| `bg-red-100 / text-red-500`                | `bg-surface-status-danger text-icon-status-danger`      |
 | Raw `<h1>`, `<h3>`, `<p>`, `<label>` in UI | Typography primitives from `@/components/ui/typography` |
-| `import { cn } from "@/lib/cn"` | `import { cn } from "@/lib/utils"` |
-| `@/src/lib/utils` | `@/lib/utils` |
-| `useEffect + fetch` for data | Server Component `async/await` or React Query |
-| Raw `<form>` without RHF | `react-hook-form` + zod resolver |
+| `import { cn } from "@/lib/cn"`            | `import { cn } from "@/lib/utils"`                      |
+| `@/src/lib/utils`                          | `@/lib/utils`                                           |
+| `useEffect + fetch` for data               | Server Component `async/await` or React Query           |
+| Raw `<form>` without RHF                   | `react-hook-form` + zod resolver                        |
 
 **Button `default` variant:** remap from shadcn stock to `bg-brand text-on-brand hover:bg-brand-hover`.
 
@@ -117,17 +118,20 @@ Every file applies these substitutions — no exceptions:
 ## Data Fetching Patterns
 
 ### Server pages
+
 - Async Server Components by default
 - `await createServerClient()` then feature query functions
 - Auth guard: `getUser()` + `redirect('/login')`
 - No `useEffect`, no client-side fetch in page files
 
 ### Feature queries (`src/features/{feature}/queries.ts`)
+
 - Pure async functions, return `{ data, error }`
 - Create their own supabase client internally
 - Table names follow actual DB schema: `trial_requirements`, `partnership_inquiries`, `equipment`, `certifications`
 
 ### Feature actions (`src/features/{feature}/actions.ts`)
+
 - `"use server"` directive at top
 - Always call `getUser()` first
 - Validate ownership before any mutation
@@ -135,12 +139,14 @@ Every file applies these substitutions — no exceptions:
 - Return `{ data }` or `{ error: string }`
 
 ### Client forms
+
 - `"use client"` leaf components only
 - `react-hook-form` + `zodResolver`
 - Call Server Actions directly (no fetch wrapper)
 - Feedback via `sonner` toast
 
 ### New Project form (specific fix)
+
 - Old: `useEffect + fetch` for therapeutic areas
 - New: areas loaded server-side in page, passed as props to `"use client"` form component
 
@@ -150,7 +156,7 @@ Every file applies these substitutions — no exceptions:
 
 ```tsx
 // (sponsor)/layout.tsx
-import Navbar from "@/components/layout/Navbar"
+import Navbar from "@/components/layout/Navbar";
 
 export default function SponsorLayout({ children }) {
   return (
@@ -158,7 +164,7 @@ export default function SponsorLayout({ children }) {
       <Navbar />
       <main>{children}</main>
     </>
-  )
+  );
 }
 ```
 
@@ -185,6 +191,7 @@ Add `<Providers>` wrapping children and `<Toaster richColors position="top-right
 ## DB Schema Reference (actual tables)
 
 Tables used by feature code (from `src/types/index.ts`):
+
 - `trial_projects`, `trial_requirements`
 - `clinics`, `equipment`, `certifications`, `clinic_availability`, `clinic_specializations`
 - `match_results`

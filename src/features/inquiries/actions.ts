@@ -6,20 +6,21 @@ import { revalidatePath } from "next/cache"
 
 const sendInquirySchema = z.object({
   matchResultId: z.string().min(1, "Match result ID is required"),
-  subject: z.string().optional(),
   message: z.string().min(1, "Message is required"),
+  notes: z.string().optional(),
 })
 
 const respondToInquirySchema = z.object({
   inquiryId: z.string().min(1, "Inquiry ID is required"),
   action: z.enum(["accepted", "declined"]),
-  message: z.string().optional(),
+  response_message: z.string().optional(),
+  decline_reason: z.string().optional(),
 })
 
 export async function sendInquiry(data: {
   matchResultId: string
-  subject?: string
   message: string
+  notes?: string
 }) {
   const result = sendInquirySchema.safeParse(data)
   if (!result.success) return { error: result.error.issues[0].message }
@@ -60,7 +61,7 @@ export async function sendInquiry(data: {
     .insert({
       match_result_id: result.data.matchResultId,
       created_by: user.id,
-      subject: result.data.subject ?? "Trial Partnership Inquiry",
+      subject: result.data.notes?.trim() || "New clinic outreach",
       status: "open",
     })
     .select()
@@ -86,19 +87,27 @@ export async function sendInquiry(data: {
 
   if (updateError) return { error: updateError.message }
 
-  revalidatePath(`/sponsor/projects/${trialProject.id}/matches`)
+  revalidatePath(`/cro/projects/${trialProject.id}/matches`)
   return { error: null }
 }
 
 export async function respondToInquiry(
   inquiryId: string,
   action: "accepted" | "declined",
-  message?: string
+  response?: {
+    response_message?: string
+    decline_reason?: string
+  }
 ) {
-  const validationResult = respondToInquirySchema.safeParse({ inquiryId, action, message })
+  const validationResult = respondToInquirySchema.safeParse({
+    inquiryId,
+    action,
+    response_message: response?.response_message,
+    decline_reason: response?.decline_reason,
+  })
   if (!validationResult.success) return { error: validationResult.error.issues[0].message }
 
-  if (action === "declined" && !message) {
+  if (action === "declined" && !response?.decline_reason) {
     return { error: "A reason is required when declining" }
   }
 
@@ -151,12 +160,14 @@ export async function respondToInquiry(
 
   if (inquiryError) return { error: inquiryError.message }
 
-  if (message) {
+  const responseMessage = response?.response_message ?? response?.decline_reason
+
+  if (responseMessage) {
     await supabase.from("inquiry_messages").insert({
       inquiry_id: inquiryId,
       sender_id: user.id,
       type: "status_update",
-      content: message,
+      content: responseMessage,
     })
   }
 

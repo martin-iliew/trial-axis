@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { Label, Heading9, BodySmall, Caption } from "@/components/ui/typography"
 import { sendInquiry } from "@/features/inquiries/actions"
 import { createClient } from "@/lib/supabase/client"
@@ -32,27 +33,11 @@ function scoreBarColor(score: number, max: number): string {
   return "bg-icon-status-danger"
 }
 
-// match_results.status — shown before any inquiry is sent
-const matchStatusColors: Record<string, string> = {
+const statusColors: Record<string, string> = {
   pending: "bg-surface-status-warning text-icon-status-warning",
   reviewed: "bg-surface-status-info text-icon-status-info",
   accepted: "bg-surface-status-success text-icon-status-success",
   rejected: "bg-surface-status-danger text-icon-status-danger",
-}
-
-// inquiries.status — shown once an inquiry row exists
-const inquiryStatusColors: Record<string, string> = {
-  open: "bg-surface-status-info text-icon-status-info",
-  in_progress: "bg-surface-status-success text-icon-status-success",
-  closed: "bg-surface-level-2 text-tertiary",
-  withdrawn: "bg-surface-level-2 text-tertiary",
-}
-
-const inquiryStatusLabels: Record<string, string> = {
-  open: "Inquiry Sent",
-  in_progress: "Accepted",
-  closed: "Declined",
-  withdrawn: "Withdrawn",
 }
 
 function ClinicPreviewModal({
@@ -63,35 +48,26 @@ function ClinicPreviewModal({
   onClose: () => void
 }) {
   const [clinic, setClinic] = useState<Tables<"clinics"> | null>(null)
-  const [areaNames, setAreaNames] = useState<string[]>([])
-  const [windows, setWindows] = useState<Tables<"clinic_availability">[]>([])
+  const [specs, setSpecs] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
     async function load() {
-      const { data: clinicData } = await supabase
-        .from("clinics")
-        .select("*")
-        .eq("id", clinicId)
-        .single()
+      const clinicRes = await supabase.from("clinics").select("*").eq("id", clinicId).single()
+      setClinic(clinicRes.data)
 
-      setClinic(clinicData)
-
-      if (clinicData?.therapeutic_area_ids?.length) {
+      const areaIds = clinicRes.data?.therapeutic_area_ids ?? []
+      if (areaIds.length > 0) {
         const { data: areas } = await supabase
           .from("therapeutic_areas")
-          .select("name")
-          .in("id", clinicData.therapeutic_area_ids)
-        setAreaNames((areas ?? []).map((a) => a.name))
-      }
+          .select("id, name")
+          .in("id", areaIds)
 
-      const { data: availData } = await supabase
-        .from("clinic_availability")
-        .select("*")
-        .eq("clinic_id", clinicId)
-        .order("start_date", { ascending: true })
-      setWindows(availData ?? [])
+        setSpecs((areas ?? []).map((area) => area.name))
+      } else {
+        setSpecs([])
+      }
 
       setLoading(false)
     }
@@ -140,35 +116,16 @@ function ClinicPreviewModal({
               )}
               {clinic.patient_capacity && (
                 <Caption>
-                  <span className="text-secondary">Max capacity: </span>
-                  {clinic.patient_capacity} patients
+                  <span className="text-secondary">Patient capacity: </span>
+                  {clinic.patient_capacity}
                 </Caption>
               )}
-              {windows.length > 0 && (
-                <div>
-                  <Caption className="text-secondary">Availability windows:</Caption>
-                  <ul className="mt-1 space-y-1">
-                    {windows.map((w) => (
-                      <li key={w.id}>
-                        <Caption>
-                          {w.start_date} – {w.end_date}
-                          {" · "}
-                          <span className="capitalize">{w.type}</span>
-                          {w.slots_available != null
-                            ? ` · ${w.slots_available} slots`
-                            : " · slots not specified"}
-                        </Caption>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {areaNames.length > 0 && (
+              {specs.length > 0 && (
                 <div>
                   <Caption className="text-secondary">Specializations: </Caption>
                   <div className="mt-1 flex flex-wrap gap-1">
-                    {areaNames.map((name) => (
-                      <Badge key={name}>{name}</Badge>
+                    {specs.map((s) => (
+                      <Badge key={s}>{s}</Badge>
                     ))}
                   </div>
                 </div>
@@ -201,6 +158,7 @@ export default function MatchResultCard({
   const [showPreview, setShowPreview] = useState(false)
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState("")
+  const [notes, setNotes] = useState("")
   const [sent, setSent] = useState(Boolean(inquiry) || matchResult.status !== "pending")
 
   async function handleSend(e: React.FormEvent) {
@@ -210,6 +168,7 @@ export default function MatchResultCard({
     const result = await sendInquiry({
       matchResultId: matchResult.id,
       message,
+      notes: notes || undefined,
     })
 
     if (result.error) {
@@ -273,14 +232,19 @@ export default function MatchResultCard({
       <div className="mt-4 border-t border-primary pt-3">
         {sent || inquiry ? (
           <div className="flex items-center gap-2">
-            {inquiry ? (
-              <Badge className={inquiryStatusColors[inquiry.status] ?? ""}>
-                {inquiryStatusLabels[inquiry.status] ?? inquiry.status}
-              </Badge>
-            ) : (
-              <Badge className={matchStatusColors[matchResult.status] ?? ""}>
-                {matchResult.status}
-              </Badge>
+            <Badge className={statusColors[inquiry?.status ?? matchResult.status] ?? ""}>
+              {inquiry?.status === "closed"
+                ? "Closed"
+                : inquiry?.status === "in_progress"
+                  ? "In Progress"
+                  : matchResult.status === "accepted"
+                    ? "Accepted"
+                    : matchResult.status === "rejected"
+                      ? "Rejected"
+                      : "Inquiry Sent"}
+            </Badge>
+            {inquiry?.subject && (
+              <Caption className="text-secondary">— {inquiry.subject}</Caption>
             )}
           </div>
         ) : showInquiryForm ? (
@@ -292,6 +256,14 @@ export default function MatchResultCard({
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Introduce your trial and explain why this clinic is a good fit..."
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Internal Notes</Label>
+              <Input
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Notes for your team (not shared with clinic)"
               />
             </div>
             <div className="flex gap-2">

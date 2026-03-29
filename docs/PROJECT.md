@@ -1,13 +1,15 @@
-# TrialMatch
+# TrialAxis
 
 ## Vision
+
 Pharma companies create drugs. To bring them to market, they must run clinical trials. They hire Contract Research Organizations (CROs) to manage these trials, and CROs need to find specific clinics (research sites) with the right capacity, equipment, expertise, and availability to execute each study. The statistics from these trials are critical to regulatory approval -- the wrong site means bad data, delays, and wasted money.
 
 Today, site selection is slow, manual, and relationship-driven. CROs rely on spreadsheets, phone calls, and personal networks to match trials to clinics. This causes delays that cost pharma companies up to EUR 8M per day in lost revenue from enrollment timeline slippage.
 
-TrialMatch automates this. A CRO or pharma sponsor inputs their trial requirements (therapeutic area, required equipment, patient pool, timeline, geographic preferences), and TrialMatch matches them with the best-fit clinics from a registered network -- scored, ranked, and ready for outreach. Fast, efficient, saving time, manual labor, and pharma costs.
+TrialAxis automates this. A CRO or pharma sponsor inputs their trial requirements (therapeutic area, required equipment, patient pool, timeline, geographic preferences), and TrialAxis matches them with the best-fit clinics from a registered network -- scored, ranked, and ready for outreach. Fast, efficient, saving time, manual labor, and pharma costs.
 
 ## Market
+
 - Pharma companies spend EUR 6,500-15,000 per recruited patient
 - Enrollment delays cost up to EUR 8M per day
 - 19-25% of EU trial slots go unfilled
@@ -15,12 +17,14 @@ TrialMatch automates this. A CRO or pharma sponsor inputs their trial requiremen
 - Starting in Bulgaria (growing trial infrastructure, 6.5M population, aging demographics with high chronic disease burden) with a clear path to scale across Eastern Europe
 
 ## Context
+
 - **Event**: AUBG Hackathon 2026
 - **Scope**: MVP demo -- core matching flow, enough to demonstrate the concept end-to-end
 - **Platform**: Web (Next.js 16 App Router + Supabase)
 - **Existing foundation**: Next.js 16 app scaffolded with Tailwind CSS v4, shadcn/ui, and Supabase project initialized
 
 ## What Already Exists
+
 - Next.js 16 app with App Router, TypeScript, Tailwind CSS v4, shadcn/ui
 - Supabase cloud project live (schema applied, RLS enabled, seed data loaded)
 - Supabase Auth configured (email/password, role stored in both `auth.users.user_metadata` and `profiles` table; auto-created by DB trigger on signup)
@@ -31,6 +35,7 @@ TrialMatch automates this. A CRO or pharma sponsor inputs their trial requiremen
 ## MVP Demo Goal
 
 ### Sponsor/CRO (logged in) can:
+
 1. Log in (existing auth)
 2. Create a trial project with requirements (therapeutic area, phase, required equipment, patient count needed, timeline, geographic preference)
 3. Run the matching algorithm against registered clinics
@@ -40,6 +45,7 @@ TrialMatch automates this. A CRO or pharma sponsor inputs their trial requiremen
 7. Track inquiry status (Pending / Accepted / Declined)
 
 ### Clinic Admin (logged in) can:
+
 1. Log in (existing auth, clinic role)
 2. Register their clinic profile (name, location, specializations, certifications)
 3. Add equipment inventory (type, quantity, availability)
@@ -48,12 +54,14 @@ TrialMatch automates this. A CRO or pharma sponsor inputs their trial requiremen
 6. Accept or decline inquiries (with reason for decline)
 
 ### Visitor (not logged in) can:
+
 1. Browse registered clinics (limited view)
 2. View the platform landing page explaining the service
 
 > **Post-MVP:** Contact form (`/contact`) is deferred. The visitor CTA goes directly to `/register`.
 
 ## Key Constraints
+
 - Hackathon timeline -- speed over perfection
 - Seed data for clinics and sample trial projects (no admin CRUD needed for MVP)
 - No real payment processing

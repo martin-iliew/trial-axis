@@ -41,7 +41,6 @@ const profileSchema = z.object({
   contact_email: z.string().email("Enter a valid email"),
   contact_phone: z.string().optional(),
   website: z.string().url("Enter a valid URL").optional().or(z.literal("")),
-  patient_capacity: z.number().int().min(1).optional(),
 })
 
 const equipmentSchema = z.object({
@@ -61,7 +60,6 @@ const availabilitySchema = z.object({
   start_date: z.string().min(1, "Start date is required"),
   end_date: z.string().min(1, "End date is required"),
   type: z.enum(["available", "busy", "tentative"]),
-  slots_available: z.number().int().min(1).optional(),
   notes: z.string().optional(),
 })
 
@@ -87,7 +85,6 @@ function ProfileTab({
         contact_email: clinic?.contact_email ?? "",
         contact_phone: clinic?.contact_phone ?? "",
         website: clinic?.website ?? "",
-        patient_capacity: clinic?.patient_capacity ?? undefined,
       },
     })
 
@@ -144,19 +141,6 @@ function ProfileTab({
         <Input id="website" placeholder="https://clinic.com" {...register("website")} />
         {errors.website && <Caption className="text-icon-status-danger">{errors.website.message}</Caption>}
       </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="patient_capacity">Total patient capacity</Label>
-        <Input
-          id="patient_capacity"
-          type="number"
-          min={1}
-          placeholder="e.g. 50"
-          {...register("patient_capacity", { valueAsNumber: true })}
-        />
-        {errors.patient_capacity && (
-          <Caption className="text-icon-status-danger">{errors.patient_capacity.message}</Caption>
-        )}
-      </div>
 
       {therapeuticAreas.length > 0 && (
         <div className="space-y-2">
@@ -196,7 +180,7 @@ function ProfileTab({
                 setSavingSpecs(false)
               }}
             >
-              {savingSpecs ? "Saving…" : "Update specializations"}
+              {savingSpecs ? "Saving…" : "Save specializations"}
             </Button>
           )}
         </div>
@@ -225,27 +209,11 @@ function EquipmentTab({
 
   async function onAdd(values: z.infer<typeof equipmentSchema>) {
     if (!clinicId) { toast.error("Save your profile first"); return }
-    const tempId = `temp-${Date.now()}`
-    const optimisticItem = {
-      id: tempId,
-      clinic_id: clinicId,
-      name: values.name,
-      category: values.category,
-      model: values.model ?? null,
-      manufacturer: null,
-      quantity: values.quantity,
-      notes: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    } as Tables<"clinic_equipment">
-    setEquipment((prev) => [...prev, optimisticItem])
-    reset()
     try {
-      const newItem = await addEquipment(clinicId, values)
-      setEquipment((prev) => prev.map((e) => (e.id === tempId ? newItem : e)))
+      await addEquipment(clinicId, values)
       toast.success("Equipment added")
+      reset()
     } catch (e) {
-      setEquipment((prev) => prev.filter((e) => e.id !== tempId))
       toast.error(e instanceof Error ? e.message : "Failed to add")
     }
   }
@@ -306,8 +274,8 @@ function EquipmentTab({
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="model">Type</Label>
-            <Input id="model" placeholder="e.g. MRI" {...register("model")} />
+            <Label htmlFor="model">Model</Label>
+            <Input id="model" placeholder="Optional" {...register("model")} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="quantity">Quantity</Label>
@@ -337,29 +305,16 @@ function CertsAvailabilityTab({
   const certForm = useForm<z.infer<typeof certSchema>>({ resolver: zodResolver(certSchema) })
   const availForm = useForm<z.infer<typeof availabilitySchema>>({
     resolver: zodResolver(availabilitySchema),
-    defaultValues: { type: "available" },
+    defaultValues: { start_date: "", end_date: "", type: "available", notes: "" },
   })
 
   async function onAddCert(values: z.infer<typeof certSchema>) {
     if (!clinicId) { toast.error("Save your profile first"); return }
-    const tempId = `temp-${Date.now()}`
-    const optimisticItem = {
-      id: tempId,
-      clinic_id: clinicId,
-      certification_name: values.certification_name,
-      issued_by: values.issued_by ?? null,
-      valid_until: values.valid_until ?? null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    } as Tables<"certifications">
-    setCertifications((prev) => [...prev, optimisticItem])
-    certForm.reset()
     try {
-      const newItem = await addCertification(clinicId, values)
-      setCertifications((prev) => prev.map((c) => (c.id === tempId ? newItem : c)))
+      await addCertification(clinicId, values)
       toast.success("Certification added")
+      certForm.reset()
     } catch (e) {
-      setCertifications((prev) => prev.filter((c) => c.id !== tempId))
       toast.error(e instanceof Error ? e.message : "Failed to add")
     }
   }
@@ -376,26 +331,11 @@ function CertsAvailabilityTab({
 
   async function onAddAvailability(values: z.infer<typeof availabilitySchema>) {
     if (!clinicId) { toast.error("Save your profile first"); return }
-    const tempId = `temp-${Date.now()}`
-    const optimisticItem = {
-      id: tempId,
-      clinic_id: clinicId,
-      start_date: values.start_date,
-      end_date: values.end_date,
-      type: values.type,
-      slots_available: values.slots_available ?? null,
-      notes: values.notes ?? null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    } as Tables<"clinic_availability">
-    setAvailability((prev) => [...prev, optimisticItem])
-    availForm.reset()
     try {
-      const newItem = await addAvailability(clinicId, values)
-      setAvailability((prev) => prev.map((a) => (a.id === tempId ? newItem : a)))
+      await addAvailability(clinicId, values)
       toast.success("Availability window added")
+      availForm.reset()
     } catch (e) {
-      setAvailability((prev) => prev.filter((a) => a.id !== tempId))
       toast.error(e instanceof Error ? e.message : "Failed to save")
     }
   }
@@ -469,14 +409,8 @@ function CertsAvailabilityTab({
             {availability.map((a) => (
               <li key={a.id} className="flex items-center justify-between rounded-xl border border-primary px-4 py-3">
                 <div>
-                  <BodySmall className="font-medium text-primary">{a.start_date} → {a.end_date}</BodySmall>
-                  <Caption className="text-secondary capitalize">
-                    {a.type}
-                    {a.slots_available != null
-                      ? ` · ${a.slots_available} patient slots`
-                      : " · slots not specified"}
-                    {a.notes ? ` · ${a.notes}` : ""}
-                  </Caption>
+                  <BodySmall className="text-primary">{a.start_date} → {a.end_date}</BodySmall>
+                  <Caption className="text-secondary capitalize">{a.type}{a.notes ? ` · ${a.notes}` : ""}</Caption>
                 </div>
                 <button
                   onClick={() => handleDeleteAvailability(a.id)}
@@ -493,14 +427,14 @@ function CertsAvailabilityTab({
           <Heading9 className="text-primary">Add availability window</Heading9>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="start_date">From</Label>
+              <Label htmlFor="start_date">Start date</Label>
               <Input id="start_date" type="date" {...availForm.register("start_date")} />
               {availForm.formState.errors.start_date && (
                 <Caption className="text-icon-status-danger">{availForm.formState.errors.start_date.message}</Caption>
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="end_date">Until</Label>
+              <Label htmlFor="end_date">End date</Label>
               <Input id="end_date" type="date" {...availForm.register("end_date")} />
               {availForm.formState.errors.end_date && (
                 <Caption className="text-icon-status-danger">{availForm.formState.errors.end_date.message}</Caption>
@@ -593,8 +527,6 @@ export default function ClinicProfileTabs({
         {tabs.map((tab) => (
           <button
             key={tab}
-            role="tab"
-            aria-selected={activeTab === tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
               "body-small -mb-px shrink-0 border-b-2 px-4 py-2.5 transition-colors",
