@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import AuthFormShell from "@/components/common/AuthFormShell"
@@ -12,7 +11,6 @@ import { Label, Caption } from "@/components/ui/typography"
 import { loginSchema, type LoginValues } from "@/features/auth/schemas"
 
 export default function LoginPage() {
-  const router = useRouter()
   const supabase = createClient()
 
   const {
@@ -33,8 +31,7 @@ export default function LoginPage() {
     }
 
     const role = data.user?.user_metadata.role as string
-    router.push(role === "sponsor" ? "/sponsor/projects" : "/clinic/profile")
-    router.refresh()
+    window.location.href = role === "sponsor" ? "/sponsor/projects" : "/clinic/profile"
   }
 
   return (

@@ -24,6 +24,15 @@ interface ScoreBreakdown {
   geographic: number
 }
 
+function normalizeOverallScore(score: number): number {
+  if (!Number.isFinite(score)) return 0
+
+  // Some environments appear to have a stricter numeric precision on
+  // match_results.overall_score than the checked-in schema suggests.
+  // Store a bounded two-decimal score so /api/match does not fail on insert.
+  return Math.min(99.99, Math.max(0, Number(score.toFixed(2))))
+}
+
 function scoreTherapeuticArea(cp: ClinicProfile, trial: TrialProject): number {
   if (!trial.therapeutic_area_id) return 30
   const ids = cp.clinic.therapeutic_area_ids ?? []
@@ -207,7 +216,7 @@ export async function POST(request: NextRequest) {
         scored.map((r) => ({
           project_id: trial_project_id,
           clinic_id: r.clinic_id,
-          overall_score: r.score,
+          overall_score: normalizeOverallScore(r.score),
           score_breakdown: r.breakdown as unknown as Json,
           status: "pending" as const,
           algorithm_version: "1.0",
