@@ -64,6 +64,7 @@ function ClinicPreviewModal({
 }) {
   const [clinic, setClinic] = useState<Tables<"clinics"> | null>(null)
   const [areaNames, setAreaNames] = useState<string[]>([])
+  const [windows, setWindows] = useState<Tables<"clinic_availability">[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -84,6 +85,13 @@ function ClinicPreviewModal({
           .in("id", clinicData.therapeutic_area_ids)
         setAreaNames((areas ?? []).map((a) => a.name))
       }
+
+      const { data: availData } = await supabase
+        .from("clinic_availability")
+        .select("*")
+        .eq("clinic_id", clinicId)
+        .order("start_date", { ascending: true })
+      setWindows(availData ?? [])
 
       setLoading(false)
     }
@@ -132,9 +140,28 @@ function ClinicPreviewModal({
               )}
               {clinic.patient_capacity && (
                 <Caption>
-                  <span className="text-secondary">Patient capacity: </span>
-                  {clinic.patient_capacity}
+                  <span className="text-secondary">Max capacity: </span>
+                  {clinic.patient_capacity} patients
                 </Caption>
+              )}
+              {windows.length > 0 && (
+                <div>
+                  <Caption className="text-secondary">Availability windows:</Caption>
+                  <ul className="mt-1 space-y-1">
+                    {windows.map((w) => (
+                      <li key={w.id}>
+                        <Caption>
+                          {w.start_date} – {w.end_date}
+                          {" · "}
+                          <span className="capitalize">{w.type}</span>
+                          {w.slots_available != null
+                            ? ` · ${w.slots_available} slots`
+                            : " · slots not specified"}
+                        </Caption>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
               {areaNames.length > 0 && (
                 <div>
