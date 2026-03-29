@@ -96,16 +96,13 @@ test.describe.serial('Sponsor — Archive non-draft project', () => {
     )
     projectUrl = page.url()
 
-    // Run matching so the project becomes active
-    await page.getByRole('button', { name: 'Find Matching Clinics' }).click()
-
-    // Wait for redirect to /matches or stay on detail page (zero results)
-    await page.waitForURL(
-      (url) =>
-        url.pathname.includes('/matches') ||
-        /\/sponsor\/projects\/[^/]+$/.test(url.pathname),
+    // Run matching so the project becomes active — wait for the API call to complete
+    const matchDone = page.waitForResponse(
+      (resp) => resp.url().includes('/api/match') && resp.request().method() === 'POST',
       { timeout: 15000 }
     )
+    await page.getByRole('button', { name: 'Find Matching Clinics' }).click()
+    await matchDone
 
     // If redirected to matches, go back to project detail
     if (page.url().includes('/matches')) {

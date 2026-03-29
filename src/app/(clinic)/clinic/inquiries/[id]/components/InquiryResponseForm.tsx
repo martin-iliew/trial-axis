@@ -19,7 +19,7 @@ export default function InquiryResponseForm({ inquiryId }: { inquiryId: string }
   async function handleRespond(action: "accepted" | "declined") {
     if (action === "declined" && !declineReason) {
       setShowDeclineReason(true)
-      setError("Please provide a decline reason")
+      setError("Decline reason is required")
       return
     }
     setLoading(true)
