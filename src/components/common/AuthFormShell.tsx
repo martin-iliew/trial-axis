@@ -1,6 +1,6 @@
-import type { ReactNode } from "react"
-import Link from "next/link"
-import { BodySmall } from "@/components/ui/typography"
+import type { ReactNode } from "react";
+import Link from "next/link";
+import { BodySmall } from "@/components/ui/typography";
 import {
   Card,
   CardContent,
@@ -8,16 +8,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
 type AuthFormShellProps = {
-  children: ReactNode
-  footerCta: string
-  footerHref: string
-  footerLabel: string
-  subtitle: string
-  title: string
-}
+  children: ReactNode;
+  footerCta: string;
+  footerHref: string;
+  footerLabel: string;
+  subtitle: string;
+  title: string;
+};
 
 export default function AuthFormShell({
   children,
@@ -28,14 +28,14 @@ export default function AuthFormShell({
   title,
 }: AuthFormShellProps) {
   return (
-    <div className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-4 py-10">
+    <div className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-20 py-16">
       <Card className="w-full max-w-md bg-surface-level-1">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-section-title">{title}</CardTitle>
           <CardDescription>{subtitle}</CardDescription>
         </CardHeader>
         <CardContent>{children}</CardContent>
-        <CardFooter className="justify-center">
+        <CardFooter className="justify-center text-center">
           <BodySmall>
             {footerLabel}{" "}
             <Link
@@ -48,5 +48,5 @@ export default function AuthFormShell({
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

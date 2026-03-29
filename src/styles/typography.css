@@ -220,7 +220,7 @@
   font-size: var(--text-7xl);
   line-height: var(--leading-7xl);
   letter-spacing: var(--tracking-7xl);
-  font-weight: 450;
+  font-weight: 600;
   font-variation-settings:
     "wdth" 100,
     "opsz" 98;
@@ -231,7 +231,7 @@
   font-size: var(--text-6xl);
   line-height: var(--leading-6xl);
   letter-spacing: var(--tracking-6xl);
-  font-weight: 450;
+  font-weight: 600;
   font-variation-settings:
     "wdth" 100,
     "opsz" 72;
@@ -242,7 +242,7 @@
   font-size: var(--text-5xl);
   line-height: var(--leading-5xl);
   letter-spacing: var(--tracking-5xl);
-  font-weight: 450;
+  font-weight: 600;
   font-variation-settings:
     "wdth" 100,
     "opsz" 54;
@@ -253,7 +253,7 @@
   font-size: var(--text-4xl);
   line-height: var(--leading-4xl);
   letter-spacing: var(--tracking-4xl);
-  font-weight: 450;
+  font-weight: 550;
   font-variation-settings:
     "wdth" 100,
     "opsz" 42;
@@ -264,7 +264,7 @@
   font-size: var(--text-3xl);
   line-height: var(--leading-3xl);
   letter-spacing: var(--tracking-3xl);
-  font-weight: 450;
+  font-weight: 550;
   font-variation-settings:
     "wdth" 100,
     "opsz" 32;
@@ -275,7 +275,7 @@
   font-size: var(--text-2xl);
   line-height: var(--leading-2xl);
   letter-spacing: var(--tracking-2xl);
-  font-weight: 450;
+  font-weight: 550;
   font-variation-settings:
     "wdth" 100,
     "opsz" 28;
@@ -286,7 +286,7 @@
   font-size: var(--text-xl);
   line-height: var(--leading-xl);
   letter-spacing: var(--tracking-xl);
-  font-weight: 450;
+  font-weight: 500;
   font-variation-settings:
     "wdth" 100,
     "opsz" 24;
@@ -297,7 +297,7 @@
   font-size: var(--text-lg);
   line-height: var(--leading-lg);
   letter-spacing: var(--tracking-lg);
-  font-weight: 450;
+  font-weight: 500;
   font-variation-settings:
     "wdth" 100,
     "opsz" 22;

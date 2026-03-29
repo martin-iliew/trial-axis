@@ -3,6 +3,7 @@
 @import "../styles/tokens.css";
 @import "../styles/typography.css";
 @import "shadcn/tailwind.css";
+@import "lenis/dist/lenis.css";
 
 @layer base {
   * {

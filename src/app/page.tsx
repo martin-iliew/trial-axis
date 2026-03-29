@@ -3,16 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   Caption,
   LandingHero,
   Heading3,
   Heading5,
+  Heading7,
   Body,
   BodySmall,
 } from "@/components/ui/typography";
 import { ClipboardList, Cpu, Handshake } from "lucide-react";
-import { createServerClient } from "@/lib/supabase/server";
+import { ClipboardList, Cpu, Handshake, ArrowUpRight } from "lucide-react";
 
 function StatCard({ value, label }: { value: string; label: string }) {
   return (
@@ -26,7 +28,6 @@ function StatCard({ value, label }: { value: string; label: string }) {
 }
 
 function StepCard({
-  step,
   icon,
   title,
   description,
@@ -37,12 +38,20 @@ function StepCard({
   description: string;
 }) {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-primary bg-surface-level-1 p-6 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/10 text-icon-primary">
-        {icon}
+    <div className="group flex min-h-56 flex-col justify-between rounded-2xl border border-primary bg-surface-level-1 p-6 transition-all duration-300 ease-out hover:scale-[1.05] hover:bg-surface-level-2 hover:shadow-lg">
+      <div className="flex items-start justify-between gap-4">
+        <Heading7>{title}</Heading7>
+        <div className="relative h-8 w-8 shrink-0">
+          <div className="absolute inset-0 flex items-center justify-center text-icon-secondary transition-opacity duration-200 group-hover:opacity-0">
+            {icon}
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface-level-0">
+              <ArrowUpRight className="size-4 text-primary" />
+            </div>
+          </div>
+        </div>
       </div>
-      <Badge>Step {step}</Badge>
-      <Heading5>{title}</Heading5>
       <BodySmall className="text-secondary">{description}</BodySmall>
     </div>
   );
@@ -54,12 +63,9 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
   const role = user?.user_metadata?.role as string | undefined;
-  const homeHref =
-    role === "sponsor"
-      ? "/sponsor/projects"
-      : role === "clinic_admin"
-        ? "/clinic/profile"
-        : null;
+
+  const dashboardHref =
+    role === "sponsor" ? "/sponsor/projects" : "/clinic/profile";
 
   return (
     <>
@@ -70,34 +76,35 @@ export default async function Home() {
         <div className="mx-auto max-w-5xl text-center">
           <Badge className="mb-6">Clinical Trial Site Matching</Badge>
           <LandingHero className="mb-6">
-            Match clinics to trials in minutes, not months
+            {user
+              ? "Welcome back to TrialMatch"
+              : "Match clinics to trials in minutes, not months"}
           </LandingHero>
           <Body className="mx-auto mb-10 max-w-2xl text-secondary">
-            TrialMatch connects pharmaceutical sponsors with the best-fit
-            research sites using intelligent, criteria-based matching. Stop
-            relying on spreadsheets and phone calls — find the right clinic,
-            faster.
+            {user
+              ? "Pick up where you left off — manage your projects, review matches, and connect with partners."
+              : "TrialMatch connects pharmaceutical sponsors with the best-fit research sites using intelligent, criteria-based matching. Stop relying on spreadsheets and phone calls — find the right clinic, faster."}
           </Body>
 
-          {/* Dual CTA */}
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            {homeHref ? (
-              <Link href={homeHref}>
+          {/* CTA — changes based on auth state */}
+          {user ? (
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href={dashboardHref}>
                 <Button size="lg">Go to Dashboard</Button>
               </Link>
-            ) : (
-              <>
-                <Link href="/register?role=sponsor">
-                  <Button size="lg">Join as Sponsor</Button>
-                </Link>
-                <Link href="/register?role=clinic_admin">
-                  <Button variant="outline" size="lg">
-                    Register Your Clinic
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/register?role=sponsor">
+                <Button size="lg">Join as Sponsor</Button>
+              </Link>
+              <Link href="/register?role=clinic_admin">
+                <Button variant="outline" size="lg">
+                  Register Your Clinic
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -120,22 +127,22 @@ export default async function Home() {
             </Body>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <StepCard
               step={1}
-              icon={<ClipboardList className="size-6" />}
+              icon={<ClipboardList className="size-5" />}
               title="Define Your Trial"
               description="Create a project with therapeutic area, equipment needs, certifications, capacity, and geographic preferences."
             />
             <StepCard
               step={2}
-              icon={<Cpu className="size-6" />}
+              icon={<Cpu className="size-5" />}
               title="Run Matching"
               description="Our algorithm scores every registered clinic across five dimensions and ranks them by fit."
             />
             <StepCard
               step={3}
-              icon={<Handshake className="size-6" />}
+              icon={<Handshake className="size-5" />}
               title="Connect & Partner"
               description="Review detailed score breakdowns, view clinic profiles, and send partnership inquiries directly."
             />
@@ -143,45 +150,41 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* For Clinics Section */}
-      <section className="border-t border-primary bg-subtle px-6 py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <Heading3 className="mb-3">For Clinics</Heading3>
-          <Body className="mb-8 text-secondary">
-            Register your site, showcase your capabilities, and get matched with
-            relevant trials automatically. No cold outreach — sponsors come to
-            you.
-          </Body>
-          {!user && (
+      {/* For Clinics Section — only for visitors */}
+      {!user && (
+        <section className="border-t border-primary bg-subtle px-6 py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <Heading3 className="mb-3">For Clinics</Heading3>
+            <Body className="mb-8 text-secondary">
+              Register your site, showcase your capabilities, and get matched
+              with relevant trials automatically. No cold outreach — sponsors
+              come to you.
+            </Body>
+>>>>>>> 431bb34 (refactor: polish landing and shell ui)
             <Link href="/register?role=clinic_admin">
               <Button variant="outline" size="lg">
                 Register Your Clinic
               </Button>
             </Link>
-          )}
-          {role === "clinic_admin" && (
-            <Link href="/clinic/profile">
-              <Button variant="outline" size="lg">
-                Manage Your Clinic
-              </Button>
-            </Link>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
-      {/* Browse CTA */}
-      <section className="px-6 py-16">
-        <div className="mx-auto max-w-3xl text-center">
-          <Heading5 className="mb-3">Explore the Network</Heading5>
-          <BodySmall className="mb-6 text-secondary">
-            Browse registered clinics across Bulgaria and Europe to see the
-            growing TrialMatch network.
-          </BodySmall>
-          <Link href="/clinics">
-            <Button variant="outline">Browse Clinics</Button>
-          </Link>
-        </div>
-      </section>
+      {/* Browse CTA — only for visitors */}
+      {!user && (
+        <section className="px-6 py-16">
+          <div className="mx-auto max-w-3xl text-center">
+            <Heading5 className="mb-3">Explore the Network</Heading5>
+            <BodySmall className="mb-6 text-secondary">
+              Browse registered clinics across Bulgaria and Europe to see the
+              growing TrialMatch network.
+            </BodySmall>
+            <Link href="/clinics">
+              <Button variant="outline">Browse Clinics</Button>
+            </Link>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </>

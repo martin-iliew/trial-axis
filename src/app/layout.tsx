@@ -25,7 +25,30 @@ export default function RootLayout({
         <Providers>
           <SmoothScrolling>{children}</SmoothScrolling>
         </Providers>
-        <Toaster richColors position="top-right" />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            className:
+              "!bg-surface-level-1 !border !border-primary !text-primary !shadow-xs !rounded-xl body-small",
+            descriptionClassName: "!text-secondary",
+            error: {
+              className:
+                "!bg-surface-status-danger !border !border-status-danger !text-primary !shadow-xs !rounded-xl body-small",
+            },
+            success: {
+              className:
+                "!bg-surface-status-success !border !border-status-success !text-primary !shadow-xs !rounded-xl body-small",
+            },
+            warning: {
+              className:
+                "!bg-surface-status-warning !border !border-status-warning !text-primary !shadow-xs !rounded-xl body-small",
+            },
+            info: {
+              className:
+                "!bg-surface-status-info !border !border-status-info !text-primary !shadow-xs !rounded-xl body-small",
+            },
+          }}
+        />
       </body>
     </html>
   );
