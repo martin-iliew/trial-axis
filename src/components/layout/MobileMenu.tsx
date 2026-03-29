@@ -52,6 +52,7 @@ export default function MobileMenu({ role, isLoggedIn, logoutAction }: Props) {
         aria-modal="true"
         aria-label="Navigation menu"
         aria-hidden={!open}
+        inert={!open ? "" : undefined}
         className={cn(
           "fixed top-0 right-0 z-50 h-full w-64 bg-surface-level-1 border-l border-primary shadow-xl transition-transform duration-300 sm:hidden flex flex-col",
           open ? "translate-x-0" : "translate-x-full"
