@@ -12,6 +12,7 @@ const upsertClinicSchema = z.object({
   contact_email: z.string().email("Invalid email address"),
   contact_phone: z.string().optional(),
   website: z.string().optional(),
+  patient_capacity: z.number().int().min(1).optional(),
 })
 
 const addEquipmentSchema = z.object({
@@ -40,6 +41,7 @@ const upsertAvailabilitySchema = z.object({
     start_date: z.string().min(1, "Start date is required"),
     end_date: z.string().min(1, "End date is required"),
     type: z.enum(["available", "busy", "tentative"]).default("available"),
+    slots_available: z.number().int().min(1).optional(),
     notes: z.string().optional(),
   }),
 })
@@ -54,6 +56,7 @@ export async function upsertClinic(data: {
   contact_email: string
   contact_phone?: string
   website?: string
+  patient_capacity?: number
 }) {
   const result = upsertClinicSchema.safeParse(data)
   if (!result.success) throw new Error(result.error.issues[0].message)
@@ -172,6 +175,7 @@ export async function addAvailability(clinicId: string, data: {
   start_date: string
   end_date: string
   type?: "available" | "busy" | "tentative"
+  slots_available?: number
   notes?: string
 }) {
   const result = upsertAvailabilitySchema.safeParse({ clinicId, data })
