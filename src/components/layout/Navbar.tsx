@@ -1,16 +1,14 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createServerClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
-
-function isCRORole(role: string | undefined) {
-  return role === "cro";
-}
+import MobileMenu from "@/components/layout/MobileMenu";
+import type { UserRole } from "@/types";
 
 async function logout() {
   "use server";
   const supabase = await createServerClient();
   await supabase.auth.signOut();
-  const { redirect } = await import("next/navigation");
   redirect("/login");
 }
 
@@ -19,7 +17,7 @@ export default async function Navbar() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const role = user?.user_metadata.role as string | undefined;
+  const role = user?.user_metadata.role as UserRole | undefined;
 
   return (
     <nav className="border-b border-primary bg-surface-level-1 px-3 py-4 sm:px-6">
@@ -28,8 +26,9 @@ export default async function Navbar() {
           TrialAxis
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          {isCRORole(role) && (
+        {/* Desktop nav — hidden on mobile */}
+        <div className="hidden sm:flex items-center gap-2">
+          {role === "cro" && (
             <>
               <Link href="/cro/projects">
                 <Button variant="outline" size="sm">
@@ -57,7 +56,6 @@ export default async function Navbar() {
               </Link>
             </>
           )}
-
           {user ? (
             <form action={logout}>
               <Button variant="outline" size="sm" type="submit">
@@ -70,6 +68,9 @@ export default async function Navbar() {
             </Link>
           )}
         </div>
+
+        {/* Mobile nav */}
+        <MobileMenu role={role} isLoggedIn={!!user} logoutAction={logout} />
       </div>
     </nav>
   );

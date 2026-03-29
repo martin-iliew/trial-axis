@@ -145,9 +145,9 @@ function ProfileTab({
       {therapeuticAreas.length > 0 && (
         <div className="space-y-2">
           <Label>Specializations</Label>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {therapeuticAreas.map((area) => (
-              <Label key={area.id} className="flex cursor-pointer items-center gap-2">
+              <Label key={area.id} className="flex cursor-pointer items-center gap-2 min-w-0">
                 <input
                   type="checkbox"
                   checked={checkedAreas.has(area.id)}
@@ -157,9 +157,9 @@ function ProfileTab({
                     else next.delete(area.id)
                     setCheckedAreas(next)
                   }}
-                  className="rounded"
+                  className="shrink-0 rounded"
                 />
-                {area.name}
+                <span className="truncate">{area.name}</span>
               </Label>
             ))}
           </div>
@@ -236,13 +236,13 @@ function EquipmentTab({
         <ul className="space-y-2">
           {equipment.map((eq) => (
             <li key={eq.id} className="flex items-center justify-between rounded-xl border border-primary px-4 py-3">
-              <div>
-                <BodySmall className="text-primary">{eq.name}</BodySmall>
-                <Caption className="text-secondary">{eq.category} · qty {eq.quantity}</Caption>
+              <div className="min-w-0 flex-1 pr-3">
+                <BodySmall className="truncate text-primary">{eq.name}</BodySmall>
+                <Caption className="truncate text-secondary">{eq.category} · qty {eq.quantity}</Caption>
               </div>
               <button
                 onClick={() => handleDelete(eq.id)}
-                className="caption text-icon-status-danger hover:underline"
+                className="caption shrink-0 text-icon-status-danger hover:underline"
               >
                 Remove
               </button>
@@ -360,13 +360,13 @@ function CertsAvailabilityTab({
           <ul className="space-y-2">
             {certifications.map((cert) => (
               <li key={cert.id} className="flex items-center justify-between rounded-xl border border-primary px-4 py-3">
-                <div>
-                  <BodySmall className="text-primary">{cert.certification_name}</BodySmall>
-                  {cert.issued_by && <Caption className="text-secondary">Issued by {cert.issued_by}</Caption>}
+                <div className="min-w-0 flex-1 pr-3">
+                  <BodySmall className="truncate text-primary">{cert.certification_name}</BodySmall>
+                  {cert.issued_by && <Caption className="truncate text-secondary">Issued by {cert.issued_by}</Caption>}
                 </div>
                 <button
                   onClick={() => handleDeleteCert(cert.id)}
-                  className="caption text-icon-status-danger hover:underline"
+                  className="caption shrink-0 text-icon-status-danger hover:underline"
                 >
                   Remove
                 </button>
@@ -408,13 +408,13 @@ function CertsAvailabilityTab({
           <ul className="space-y-2">
             {availability.map((a) => (
               <li key={a.id} className="flex items-center justify-between rounded-xl border border-primary px-4 py-3">
-                <div>
-                  <BodySmall className="text-primary">{a.start_date} → {a.end_date}</BodySmall>
-                  <Caption className="text-secondary capitalize">{a.type}{a.notes ? ` · ${a.notes}` : ""}</Caption>
+                <div className="min-w-0 flex-1 pr-3">
+                  <BodySmall className="truncate text-primary">{a.start_date} → {a.end_date}</BodySmall>
+                  <Caption className="truncate text-secondary capitalize">{a.type}{a.notes ? ` · ${a.notes}` : ""}</Caption>
                 </div>
                 <button
                   onClick={() => handleDeleteAvailability(a.id)}
-                  className="caption text-icon-status-danger hover:underline"
+                  className="caption shrink-0 text-icon-status-danger hover:underline"
                 >
                   Remove
                 </button>
