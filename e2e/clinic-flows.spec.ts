@@ -25,7 +25,7 @@ test.describe('Clinic Admin — Profile Management (R3, §4.1)', () => {
   test('profile form has required fields: name, city, contact email (§4.1 step 2)', async ({ page }) => {
     await page.goto('/clinic/profile')
     await expect(page.getByLabel(/clinic name/i)).toBeVisible()
-    await expect(page.getByLabel(/city/i)).toBeVisible()
+    await expect(page.getByLabel('City', { exact: true })).toBeVisible()
     await expect(page.getByLabel(/contact email/i)).toBeVisible()
   })
 
@@ -100,7 +100,7 @@ test.describe('Clinic Admin — Equipment Management (R3.2, §4.2)', () => {
       .fill('E2E Test MRI Scanner')
 
     await page.getByRole('button', { name: /save|add/i }).last().click()
-    await expect(page.getByText('E2E Test MRI Scanner')).toBeVisible()
+    await expect(page.getByText('E2E Test MRI Scanner').first()).toBeVisible()
   })
 })
 
